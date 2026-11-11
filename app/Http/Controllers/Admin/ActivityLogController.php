@@ -35,3 +35,4 @@ class ActivityLogController extends Controller
         return view('admin.activity.index', compact('logs', 'users'));
     }
 }
+

@@ -58,3 +58,4 @@ class OtpVerification extends Model
         return Hash::check($code, $this->otp_hash);
     }
 }
+

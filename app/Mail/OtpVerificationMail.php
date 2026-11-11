@@ -42,3 +42,4 @@ class OtpVerificationMail extends Mailable
         return [];
     }
 }
+

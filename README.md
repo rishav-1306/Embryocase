@@ -18,29 +18,24 @@
 
 ---
 
-## 2. Default Seeded Credentials
+## 2. Active Credentials
 
 ### A. Central System Administrator
 - **Portal URL:** `http://localhost:8000/login/admin`
-- **Email:** `admin@embryocase.lab`
-- **Password:** `AdminPassword123!`
+- **Name:** `Rishav`
+- **Email:** `rishav1306singh@gmail.com`
+- **Password:** `Rishav@1306`
+- **Secret Code / Key:** `RISHAV1306`
 - **Role:** Administrator (Central database ownership, staff management, case oversight, backups)
-- **OTP Verification:** Dispatched to email (in local debug mode, displayed directly on screen for developer testing)
+- **OTP Verification:** Dispatched to email (in local debug mode, displayed directly on screen for testing)
 
-### B. Clinical Embryologists
+### B. Clinical Embryologist / User
 - **Portal URL:** `http://localhost:8000/login`
-
-**Account 1:**
-- **1. Full Name:** `Dr. Sarah Chen`
-- **2. Email:** `sarah.chen@embryocase.lab`
-- **3. Password:** `EmbryoPassword123!`
-- **4. Special Key:** `EMB-KEY-7892-XYZ`
-
-**Account 2:**
-- **1. Full Name:** `Dr. Arthur Miller`
-- **2. Email:** `arthur.miller@embryocase.lab`
-- **3. Password:** `EmbryoPassword123!`
-- **4. Special Key:** `EMB-KEY-4519-ABC`
+- **1. Full Name:** `Aryan`
+- **2. Registered Email:** `nikhilaryan0223@gmail.com`
+- **3. Password:** `Aryan@2005`
+- **4. Special Key:** `RISHAV1306`
+*(All 4 credentials mandatory on every login, followed by 6-digit OTP verification)*
 
 ---
 

@@ -71,3 +71,4 @@ class EmbryoCase extends Model
         return sprintf("EMB-%s-%04d", $year, $nextNumber);
     }
 }
+

@@ -44,3 +44,4 @@ class ImageAnnotation extends Model
         return $this->hasMany(AnnotationVersion::class, 'annotation_id')->orderBy('version', 'desc');
     }
 }
+

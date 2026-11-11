@@ -50,3 +50,4 @@ class EmbryologistDashboardController extends Controller
         return view('embryologist.activity', compact('logs'));
     }
 }
+

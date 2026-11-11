@@ -46,3 +46,4 @@ class BackupLog extends Model
         return $bytes . ' B';
     }
 }
+

@@ -188,3 +188,4 @@ class EmbryologistManagementController extends Controller
         return back()->with('status', "Special Key for {$embryologist->name} has been revoked. Login is immediately blocked until a new key is issued.");
     }
 }
+

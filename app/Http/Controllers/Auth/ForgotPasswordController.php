@@ -134,3 +134,4 @@ class ForgotPasswordController extends Controller
         return redirect()->route('login')->with('status', 'Your laboratory password has been successfully reset. Please log in.');
     }
 }
+

@@ -158,3 +158,4 @@ return new class extends Migration
         Schema::dropIfExists('embryo_cases');
     }
 };
+

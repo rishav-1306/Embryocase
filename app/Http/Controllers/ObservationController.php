@@ -60,3 +60,4 @@ class ObservationController extends Controller
         return back()->with('status', 'Clinical observation removed.');
     }
 }
+

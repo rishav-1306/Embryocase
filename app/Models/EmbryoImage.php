@@ -80,3 +80,4 @@ class EmbryoImage extends Model
         return $bytes . ' B';
     }
 }
+

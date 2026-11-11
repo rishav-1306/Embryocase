@@ -9,3 +9,4 @@ echo Press Ctrl+C to terminate the laboratory server.
 echo.
 "%~dp0tools\php\php.exe" "%~dp0artisan" serve --port=8000
 pause
+

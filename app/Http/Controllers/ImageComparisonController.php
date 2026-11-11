@@ -44,3 +44,4 @@ class ImageComparisonController extends Controller
         return view('images.compare', compact('case', 'allImages', 'imageA', 'imageB', 'typeA', 'typeB'));
     }
 }
+

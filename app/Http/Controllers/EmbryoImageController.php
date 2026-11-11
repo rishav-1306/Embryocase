@@ -262,3 +262,4 @@ class EmbryoImageController extends Controller
             ->with('status', "Image {$filename} removed.");
     }
 }
+

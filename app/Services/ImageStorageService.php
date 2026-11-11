@@ -216,4 +216,107 @@ class ImageStorageService
         $zip->close();
         return $zipFilePath;
     }
+
+    /**
+     * Create downloadable master ZIP archive for multiple selected Embryo Cases
+     *
+     * @param EmbryoCase[]|\Illuminate\Database\Eloquent\Collection $cases
+     */
+    public function exportMultipleCasesToZip($cases): string
+    {
+        $timestamp = date('Y-m-d_H-i-s');
+        $zipFileName = "EmbryoCase_Batch_Export_{$timestamp}.zip";
+        $tempDir = storage_path('app/temp_exports');
+        if (!file_exists($tempDir)) {
+            @mkdir($tempDir, 0777, true);
+        }
+
+        $zipFilePath = "{$tempDir}/{$zipFileName}";
+        if (file_exists($zipFilePath)) {
+            @unlink($zipFilePath);
+        }
+
+        $zip = new ZipArchive();
+        if ($zip->open($zipFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
+            throw new \RuntimeException("Cannot initialize master batch ZIP archive at {$zipFilePath}");
+        }
+
+        // Summary manifest
+        $manifest = [
+            'batch_export_timestamp' => now()->toIso8601String(),
+            'total_cases' => count($cases),
+            'cases' => [],
+        ];
+
+        foreach ($cases as $case) {
+            $casePrefix = $case->case_id;
+            $zip->addEmptyDir($casePrefix);
+
+            $metadata = [
+                'case_id' => $case->case_id,
+                'embryo_number' => $case->embryo_number,
+                'father_name' => $case->father_name,
+                'mother_name' => $case->mother_name,
+                'collection_date' => $case->collection_date?->format('Y-m-d'),
+                'collection_time' => $case->collection_time,
+                'total_days' => $case->total_days,
+                'status' => $case->status,
+                'embryologist' => [
+                    'id' => $case->user?->id,
+                    'name' => $case->user?->name,
+                    'email' => $case->user?->email,
+                ],
+                'lab_notes' => $case->lab_notes,
+                'additional_observations' => $case->additional_observations,
+                'created_at' => $case->created_at?->toIso8601String(),
+                'observations' => $case->observations->map(function ($obs) {
+                    return [
+                        'day_number' => $obs->day_number,
+                        'title' => $obs->title,
+                        'description' => $obs->description,
+                        'author' => $obs->user?->name,
+                        'created_at' => $obs->created_at?->toIso8601String(),
+                    ];
+                })->toArray(),
+            ];
+
+            $zip->addFromString("{$casePrefix}/Case_Metadata.json", json_encode($metadata, JSON_PRETTY_PRINT));
+
+            for ($d = 1; $d <= $case->total_days; $d++) {
+                $zip->addEmptyDir("{$casePrefix}/Day_{$d}");
+            }
+
+            foreach ($case->images as $img) {
+                $dayFolder = "{$casePrefix}/Day_{$img->day_number}";
+
+                if ($this->getPrivateDisk()->exists($img->storage_path)) {
+                    $absPath = $this->getPrivateDisk()->path($img->storage_path);
+                    $zip->addFile($absPath, "{$dayFolder}/{$img->filename}");
+                }
+
+                if ($img->has_edit && $img->edited_storage_path && $this->getPrivateDisk()->exists($img->edited_storage_path)) {
+                    $absEditedPath = $this->getPrivateDisk()->path($img->edited_storage_path);
+                    $zip->addFile($absEditedPath, "{$dayFolder}/{$img->edited_filename}");
+                }
+
+                if ($img->annotation_json_path && $this->getPrivateDisk()->exists($img->annotation_json_path)) {
+                    $absJsonPath = $this->getPrivateDisk()->path($img->annotation_json_path);
+                    $jsonBasename = basename($img->annotation_json_path);
+                    $zip->addFile($absJsonPath, "{$dayFolder}/{$jsonBasename}");
+                }
+            }
+
+            $manifest['cases'][] = [
+                'case_id' => $case->case_id,
+                'embryo_number' => $case->embryo_number,
+                'image_count' => $case->images->count(),
+            ];
+        }
+
+        $zip->addFromString("Batch_Manifest.json", json_encode($manifest, JSON_PRETTY_PRINT));
+        $zip->close();
+
+        return $zipFilePath;
+    }
 }
+
