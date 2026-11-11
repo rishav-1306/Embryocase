@@ -184,6 +184,16 @@ class EmbryoCaseWorkflowTest extends TestCase
             'image_id' => $image->id,
             'version' => 1,
         ]);
+
+        // Verify that the Case show view displays BOTH Original and Edited cards with the exact same timestamp
+        $viewResponse = $this->get(route('cases.show', ['caseId' => $case->case_id, 'day' => 1]));
+        $viewResponse->assertStatus(200);
+        $viewResponse->assertSee('ORIGINAL');
+        $viewResponse->assertSee('EDITED (_E)');
+        $viewResponse->assertSee('09-00-00.png');
+        $viewResponse->assertSee('09-00-00_E.png');
+        $viewResponse->assertSee('09:00:00');
+        $viewResponse->assertSee('SAME TIME');
     }
 }
 

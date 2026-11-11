@@ -11,6 +11,21 @@
     </div>
 </div>
 
+@if(session('debug_otp'))
+    <div class="alert alert-dark p-3 mb-3 text-center mono" style="font-size: 13px; border: 1px dashed #000; background-color: var(--bg-off-white);">
+        <span class="text-secondary-label d-block mb-1" style="font-size: 10px;">[LOCAL DEVELOPMENT MODE]</span>
+        VERIFICATION CODE: <strong class="fs-4 text-black">{{ session('debug_otp') }}</strong>
+        <div class="text-muted mt-1" style="font-size: 11px;">
+            (Set up SMTP in <code>.env</code> to deliver directly to real inbox)
+        </div>
+    </div>
+@elseif(config('mail.default') === 'log')
+    <div class="alert alert-dark p-2 mb-3 text-center mono" style="font-size: 11px; border: 1px dashed var(--border-grey); background-color: var(--bg-off-white);">
+        <span class="text-secondary-label d-block" style="font-size: 10px;">[MAIL DRIVER: LOG]</span>
+        Emails are currently written to: <code class="mono">storage/logs/laravel.log</code>
+    </div>
+@endif
+
 <form method="POST" action="{{ route('auth.otp.verify') }}" autocomplete="off">
     @csrf
 

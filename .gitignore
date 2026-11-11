@@ -1,30 +1,63 @@
-*.log
-.DS_Store
+# Environment & Secrets
 .env
 .env.backup
 .env.production
-.phpactor.json
-.phpunit.result.cache
-/.codex
-/.cursor/
-/.idea
-/.nova
-/.phpunit.cache
-/.vscode
-/.zed
-/auth.json
-/node_modules
-/public/build
-/public/fonts-manifest.dev.json
-/public/hot
-/public/storage
-/storage/*.key
-/storage/pail
-/vendor
-_ide_helper.php
-/tools
+.env.*.local
+auth.json
+
+# Dependencies
+/vendor/
+/node_modules/
+
+# Local Tools & Portable PHP
+/tools/
+php.cmd
+composer.cmd
+
+# Temporary folders
+/embryo_temp/
+
+# SQLite Databases & Local Storage
+*.sqlite
+*.sqlite-journal
+*.db
+/database/*.sqlite
+/storage/app/private/embryos/*
 /storage/app/backups/*
 /storage/app/temp_exports/*
+/storage/*.key
+/storage/pail
+
+# Framework generated & logs
+/storage/framework/cache/*
+/storage/framework/sessions/*
+/storage/framework/testing/*
+/storage/framework/views/*
+/storage/logs/*
+*.log
+/bootstrap/cache/*.php
+!/bootstrap/cache/.gitignore
+
+# Build outputs
+/public/build
+/public/hot
+/public/storage
+/public/fonts-manifest.dev.json
+
+# Caches & IDEs
+.phpunit.result.cache
+/.phpunit.cache
+/.idea
+/.vscode
+/.cursor/
+/.codex
+/.nova
+/.zed
+_ide_helper.php
+.phpactor.json
 Homestead.json
 Homestead.yaml
+
+# OS files
+.DS_Store
 Thumbs.db

@@ -59,9 +59,19 @@
 @if($viewMode === 'timeline')
     <!-- ==================== TIMELINE VIEW ==================== -->
     <div class="sci-card">
-        <div class="sci-card-header">
-            <span class="sci-card-title">DEVELOPMENT CHRONOLOGICAL TIMELINE</span>
-            <span class="mono" style="font-size: 12px;">TOTAL ACQUISITIONS: {{ $case->images->count() }}</span>
+        <div class="sci-card-header d-flex flex-wrap justify-content-between align-items-center gap-2">
+            <div>
+                <span class="sci-card-title">DEVELOPMENT CHRONOLOGICAL TIMELINE</span>
+                <span class="mono ms-2" style="font-size: 12px;">
+                    {{ $case->images->count() }} RAW ORIGINAL(S) &bull; {{ $case->images->where('has_edit', true)->count() }} EDITED (_E)
+                </span>
+            </div>
+            <!-- Timeline Gallery Filter -->
+            <div class="btn-group btn-group-sm" role="group" id="timelineFilterGroup">
+                <button type="button" class="btn btn-sci-primary active" data-filter="all">ALL (ORIGINAL + EDITED)</button>
+                <button type="button" class="btn btn-sci-secondary" data-filter="original">ORIGINALS ONLY</button>
+                <button type="button" class="btn btn-sci-secondary" data-filter="edited">EDITED ONLY</button>
+            </div>
         </div>
         <div class="sci-card-body p-4">
             @php
@@ -69,7 +79,10 @@
             @endphp
 
             @for($d = 1; $d <= $case->total_days; $d++)
-                @php $dayImgs = $imagesByDay->get($d, collect()); @endphp
+                @php 
+                    $dayImgs = $imagesByDay->get($d, collect()); 
+                    $editedCount = $dayImgs->where('has_edit', true)->count();
+                @endphp
                 <div class="mb-5 pb-3 border-bottom" style="border-color: var(--border-grey) !important;">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <div class="d-flex align-items-center gap-2">
@@ -80,36 +93,44 @@
                                 @endif
                             </span>
                         </div>
-                        <span class="mono text-muted" style="font-size: 12px;">{{ $dayImgs->count() }} Images Captured</span>
+                        <span class="mono text-muted" style="font-size: 12px;">
+                            {{ $dayImgs->count() }} Original(s) &bull; {{ $editedCount }} Edited Version(s)
+                        </span>
                     </div>
 
                     @if($dayImgs->count() > 0)
                         <div class="embryo-gallery">
                             @foreach($dayImgs->sortBy('capture_time') as $img)
-                                <div class="embryo-card">
+                                <!-- 1. ORIGINAL RAW IMAGE CARD (PERMANENT & PRESERVED) -->
+                                <div class="embryo-card gallery-item-original">
                                     <div class="embryo-thumb-container">
-                                        <img src="{{ route('images.serve', ['id' => $img->id, 'type' => $img->has_edit ? 'edited' : 'original']) }}"
-                                             alt="Embryo acquisition {{ $img->filename }}"
+                                        <img src="{{ route('images.serve', ['id' => $img->id, 'type' => 'original']) }}"
+                                             alt="Original acquisition {{ $img->filename }}"
                                              class="embryo-thumb"
                                              loading="lazy">
-
+                                        <span class="position-absolute top-0 start-0 m-2 badge-sci badge-sci-neutral" style="font-size: 10px; background-color: rgba(255,255,255,0.95); border: 1px solid #000;">
+                                            ORIGINAL
+                                        </span>
                                         @if($img->has_edit)
-                                            <span class="position-absolute top-0 end-0 m-2 badge-sci badge-sci-active" style="font-size: 10px;">
-                                                EDITED (_E)
+                                            <span class="position-absolute top-0 end-0 m-2 badge-sci badge-sci-active" style="font-size: 10px;" title="Edited version available at exact same timestamp">
+                                                HAS EDIT &rarr;
                                             </span>
                                         @endif
                                     </div>
                                     <div class="embryo-card-info">
                                         <div class="d-flex justify-content-between align-items-center mb-1">
-                                            <span class="embryo-time mono">{{ $img->capture_time }}</span>
+                                            <span class="embryo-time mono" title="Acquisition Time">{{ $img->capture_time }}</span>
                                             <span class="text-muted mono" style="font-size: 11px;">{{ $img->formatted_file_size }}</span>
                                         </div>
-                                        <div class="text-muted mono mb-2" style="font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                        <div class="text-muted mono mb-1" style="font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="{{ $img->filename }}">
                                             {{ $img->filename }}
                                         </div>
+                                        <div class="text-secondary-label mb-2" style="font-size: 10px;">
+                                            RAW UNTOUCHED &bull; {{ $img->width && $img->height ? "{$img->width}×{$img->height}px" : 'Microscopy' }}
+                                        </div>
                                         <div class="d-flex gap-1">
-                                            <a href="{{ route('images.view', $img->id) }}" class="btn btn-sm btn-sci-secondary w-50" style="font-size: 11px;">
-                                                VIEW
+                                            <a href="{{ route('images.view', ['id' => $img->id, 'mode' => 'original']) }}" class="btn btn-sm btn-sci-secondary w-50" style="font-size: 11px;">
+                                                VIEW ORIGINAL
                                             </a>
                                             <a href="{{ route('images.editor', $img->id) }}" class="btn btn-sm btn-sci-primary w-50" style="font-size: 11px;">
                                                 ANNOTATE
@@ -117,6 +138,47 @@
                                         </div>
                                     </div>
                                 </div>
+
+                                <!-- 2. EDITED ANNOTATION CARD (SAME ACQUISITION TIMESTAMP) -->
+                                @if($img->has_edit)
+                                    <div class="embryo-card gallery-item-edited" style="border: 1px solid #000000;">
+                                        <div class="embryo-thumb-container" style="background-color: #111;">
+                                            <img src="{{ route('images.serve', ['id' => $img->id, 'type' => 'edited', 'v' => $img->annotation?->version]) }}"
+                                                 alt="Edited acquisition {{ $img->edited_filename }}"
+                                                 class="embryo-thumb"
+                                                 loading="lazy">
+                                            <span class="position-absolute top-0 start-0 m-2 badge-sci badge-sci-active" style="font-size: 10px;">
+                                                EDITED (_E)
+                                            </span>
+                                            <span class="position-absolute top-0 end-0 m-2 badge-sci badge-sci-neutral" style="font-size: 10px; background-color: rgba(255,255,255,0.95); border: 1px solid #000;">
+                                                v{{ $img->annotation?->version ?? 1 }}
+                                            </span>
+                                        </div>
+                                        <div class="embryo-card-info" style="background-color: var(--bg-off-white);">
+                                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                                <span class="embryo-time mono text-black fw-bold" title="Acquisition Time (Exact same as original)">{{ $img->capture_time }}</span>
+                                                <span class="badge-sci badge-sci-neutral mono" style="font-size: 9px; padding: 2px 4px;">SAME TIME</span>
+                                            </div>
+                                            <div class="text-muted mono mb-1" style="font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="{{ $img->edited_filename }}">
+                                                {{ $img->edited_filename }}
+                                            </div>
+                                            <div class="text-secondary-label mb-2" style="font-size: 10px;">
+                                                CLINICAL ANNOTATION LAYER
+                                            </div>
+                                            <div class="d-flex gap-1 mb-1">
+                                                <a href="{{ route('images.view', ['id' => $img->id, 'mode' => 'edited']) }}" class="btn btn-sm btn-sci-secondary w-50" style="font-size: 11px;">
+                                                    VIEW EDITED
+                                                </a>
+                                                <a href="{{ route('images.editor', $img->id) }}" class="btn btn-sm btn-sci-primary w-50" style="font-size: 11px;">
+                                                    RE-ANNOTATE
+                                                </a>
+                                            </div>
+                                            <a href="{{ route('cases.compare', ['caseId' => $case->case_id, 'image_a' => $img->id, 'type_a' => 'original', 'image_b' => $img->id, 'type_b' => 'edited']) }}" class="btn btn-sm btn-sci-subtle w-100 py-0" style="font-size: 10px; text-align: center;">
+                                                COMPARE WITH ORIGINAL &rarr;
+                                            </a>
+                                        </div>
+                                    </div>
+                                @endif
                             @endforeach
                         </div>
                     @else
@@ -286,15 +348,32 @@
                 </div>
 
                 <!-- Active Day Action Bar -->
-                <div class="p-3 border-bottom d-flex justify-content-between align-items-center" style="background-color: var(--bg-white); border-color: var(--border-grey) !important;">
+                @php
+                    $rawOriginalCount = $dayImages->count();
+                    $editedVersionCount = $dayImages->where('has_edit', true)->count();
+                @endphp
+                <div class="p-3 border-bottom d-flex flex-wrap justify-content-between align-items-center gap-2" style="background-color: var(--bg-white); border-color: var(--border-grey) !important;">
                     <div>
                         <h3 class="mb-0">DAY {{ $activeDay }} REPOSITORY</h3>
                         <div class="text-muted" style="font-size: 12px;">
-                            {{ $dayImages->count() }} acquisition file(s) &bull;
+                            <span class="mono fw-bold text-black">{{ $rawOriginalCount }}</span> Original Raw Specimen(s) &bull;
+                            <span class="mono fw-bold text-black">{{ $editedVersionCount }}</span> Edited Annotation(s) (_E) &bull;
                             Path: <code class="mono" style="font-size: 11px;">storage/app/private/embryos/{{ $case->case_id }}/Day_{{ $activeDay }}/</code>
                         </div>
                     </div>
-                    <div>
+                    <div class="d-flex align-items-center gap-2">
+                        <!-- Filter Toggle -->
+                        <div class="btn-group btn-group-sm" role="group" id="folderFilterGroup">
+                            <button type="button" class="btn btn-sci-primary active" data-filter="all">
+                                ALL ({{ $rawOriginalCount + $editedVersionCount }})
+                            </button>
+                            <button type="button" class="btn btn-sci-secondary" data-filter="original">
+                                ORIGINALS ({{ $rawOriginalCount }})
+                            </button>
+                            <button type="button" class="btn btn-sci-secondary" data-filter="edited">
+                                EDITED ({{ $editedVersionCount }})
+                            </button>
+                        </div>
                         <button type="button" class="btn btn-sm btn-sci-primary" data-bs-toggle="modal" data-bs-target="#uploadModal">
                             + UPLOAD TO DAY {{ $activeDay }}
                         </button>
@@ -306,35 +385,36 @@
                     @if($dayImages->count() > 0)
                         <div class="embryo-gallery">
                             @foreach($dayImages->sortBy('capture_time') as $img)
-                                <div class="embryo-card">
+                                <!-- 1. ORIGINAL RAW ACQUISITION CARD (PERMANENT & PRESERVED) -->
+                                <div class="embryo-card gallery-item-original">
                                     <div class="embryo-thumb-container">
-                                        <img src="{{ route('images.serve', ['id' => $img->id, 'type' => $img->has_edit ? 'edited' : 'original']) }}"
-                                             alt="{{ $img->filename }}"
+                                        <img src="{{ route('images.serve', ['id' => $img->id, 'type' => 'original']) }}"
+                                             alt="Original acquisition {{ $img->filename }}"
                                              class="embryo-thumb"
                                              loading="lazy">
-
+                                        <span class="position-absolute top-0 start-0 m-2 badge-sci badge-sci-neutral" style="font-size: 10px; background-color: rgba(255,255,255,0.95); border: 1px solid #000;">
+                                            ORIGINAL
+                                        </span>
                                         @if($img->has_edit)
-                                            <span class="position-absolute top-0 end-0 m-2 badge-sci badge-sci-active" style="font-size: 10px;">
-                                                EDITED (_E)
+                                            <span class="position-absolute top-0 end-0 m-2 badge-sci badge-sci-active" style="font-size: 10px;" title="Edited version preserved at exact same acquisition timestamp">
+                                                HAS EDIT &rarr;
                                             </span>
                                         @endif
                                     </div>
                                     <div class="embryo-card-info">
                                         <div class="d-flex justify-content-between align-items-center mb-1">
-                                            <span class="embryo-time mono">{{ $img->capture_time }}</span>
+                                            <span class="embryo-time mono" title="Acquisition Time">{{ $img->capture_time }}</span>
                                             <span class="text-muted mono" style="font-size: 11px;">{{ $img->formatted_file_size }}</span>
                                         </div>
-                                        <div class="text-muted mono mb-2" style="font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="{{ $img->filename }}">
+                                        <div class="text-muted mono mb-1" style="font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="{{ $img->filename }}">
                                             {{ $img->filename }}
                                         </div>
-                                        @if($img->width && $img->height)
-                                            <div class="text-muted mono mb-2" style="font-size: 10px;">
-                                                {{ $img->width }} &times; {{ $img->height }} px
-                                            </div>
-                                        @endif
+                                        <div class="text-secondary-label mb-2" style="font-size: 10px;">
+                                            RAW UNTOUCHED &bull; {{ $img->width && $img->height ? "{$img->width}×{$img->height}px" : 'Microscopy' }}
+                                        </div>
                                         <div class="d-flex gap-1">
-                                            <a href="{{ route('images.view', $img->id) }}" class="btn btn-sm btn-sci-secondary w-50" style="font-size: 11px;">
-                                                VIEW
+                                            <a href="{{ route('images.view', ['id' => $img->id, 'mode' => 'original']) }}" class="btn btn-sm btn-sci-secondary w-50" style="font-size: 11px;">
+                                                VIEW ORIGINAL
                                             </a>
                                             <a href="{{ route('images.editor', $img->id) }}" class="btn btn-sm btn-sci-primary w-50" style="font-size: 11px;">
                                                 ANNOTATE
@@ -342,6 +422,47 @@
                                         </div>
                                     </div>
                                 </div>
+
+                                <!-- 2. EDITED ANNOTATION CARD (EXACT SAME ACQUISITION TIMESTAMP) -->
+                                @if($img->has_edit)
+                                    <div class="embryo-card gallery-item-edited" style="border: 1px solid #000000;">
+                                        <div class="embryo-thumb-container" style="background-color: #111;">
+                                            <img src="{{ route('images.serve', ['id' => $img->id, 'type' => 'edited', 'v' => $img->annotation?->version]) }}"
+                                                 alt="Edited acquisition {{ $img->edited_filename }}"
+                                                 class="embryo-thumb"
+                                                 loading="lazy">
+                                            <span class="position-absolute top-0 start-0 m-2 badge-sci badge-sci-active" style="font-size: 10px;">
+                                                EDITED (_E)
+                                            </span>
+                                            <span class="position-absolute top-0 end-0 m-2 badge-sci badge-sci-neutral" style="font-size: 10px; background-color: rgba(255,255,255,0.95); border: 1px solid #000;">
+                                                v{{ $img->annotation?->version ?? 1 }}
+                                            </span>
+                                        </div>
+                                        <div class="embryo-card-info" style="background-color: var(--bg-off-white);">
+                                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                                <span class="embryo-time mono text-black fw-bold" title="Acquisition Time (Identical to original)">{{ $img->capture_time }}</span>
+                                                <span class="badge-sci badge-sci-neutral mono" style="font-size: 9px; padding: 2px 4px;">SAME TIME</span>
+                                            </div>
+                                            <div class="text-muted mono mb-1" style="font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="{{ $img->edited_filename }}">
+                                                {{ $img->edited_filename }}
+                                            </div>
+                                            <div class="text-secondary-label mb-2" style="font-size: 10px;">
+                                                CLINICAL ANNOTATION LAYER
+                                            </div>
+                                            <div class="d-flex gap-1 mb-1">
+                                                <a href="{{ route('images.view', ['id' => $img->id, 'mode' => 'edited']) }}" class="btn btn-sm btn-sci-secondary w-50" style="font-size: 11px;">
+                                                    VIEW EDITED
+                                                </a>
+                                                <a href="{{ route('images.editor', $img->id) }}" class="btn btn-sm btn-sci-primary w-50" style="font-size: 11px;">
+                                                    RE-ANNOTATE
+                                                </a>
+                                            </div>
+                                            <a href="{{ route('cases.compare', ['caseId' => $case->case_id, 'image_a' => $img->id, 'type_a' => 'original', 'image_b' => $img->id, 'type_b' => 'edited']) }}" class="btn btn-sm btn-sci-subtle w-100 py-0" style="font-size: 10px; text-align: center;">
+                                                COMPARE WITH ORIGINAL &rarr;
+                                            </a>
+                                        </div>
+                                    </div>
+                                @endif
                             @endforeach
                         </div>
                     @else
@@ -427,5 +548,42 @@
         </div>
     </div>
 </div>
+@endsection
+
+@section('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    function setupFilter(groupId) {
+        const group = document.getElementById(groupId);
+        if (!group) return;
+
+        const buttons = group.querySelectorAll('button[data-filter]');
+        buttons.forEach(btn => {
+            btn.addEventListener('click', function() {
+                buttons.forEach(b => {
+                    b.classList.remove('btn-sci-primary', 'active');
+                    b.classList.add('btn-sci-secondary');
+                });
+                this.classList.remove('btn-sci-secondary');
+                this.classList.add('btn-sci-primary', 'active');
+
+                const filter = this.getAttribute('data-filter');
+                const originals = document.querySelectorAll('.gallery-item-original');
+                const editeds = document.querySelectorAll('.gallery-item-edited');
+
+                originals.forEach(el => {
+                    el.style.display = (filter === 'all' || filter === 'original') ? 'flex' : 'none';
+                });
+                editeds.forEach(el => {
+                    el.style.display = (filter === 'all' || filter === 'edited') ? 'flex' : 'none';
+                });
+            });
+        });
+    }
+
+    setupFilter('folderFilterGroup');
+    setupFilter('timelineFilterGroup');
+});
+</script>
 @endsection
 

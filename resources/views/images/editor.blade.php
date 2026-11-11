@@ -746,7 +746,7 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(data => {
             if (data.success) {
                 alert("Annotation version " + data.version + " saved successfully. Redirecting to Image Viewer.");
-                window.location.href = "{{ route('images.view', $image->id) }}";
+                window.location.href = "{{ route('images.view', ['id' => $image->id, 'mode' => 'edited']) }}";
             } else {
                 alert("Error saving: " + data.message);
                 saveBtn.disabled = false;

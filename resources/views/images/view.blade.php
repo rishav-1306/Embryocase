@@ -3,6 +3,11 @@
 @section('title', 'Scientific Image Viewer: ' . $image->filename)
 
 @section('content')
+@php
+    $requestedMode = request('mode');
+    $initialMode = ($requestedMode === 'original' || !$image->has_edit) ? 'original' : 'edited';
+@endphp
+
 <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-3 pb-2 border-bottom" style="border-color: var(--border-grey) !important;">
     <div>
         <div class="d-flex align-items-center gap-2 mb-1">
@@ -10,23 +15,33 @@
             <span class="mono fw-bold">{{ $image->embryoCase->case_id }}</span>
             <span class="badge-sci badge-sci-neutral">DAY {{ $image->day_number }}</span>
             @if($image->has_edit)
-                <span class="badge-sci badge-sci-active" id="statusBadge">EDITED PREVIEW</span>
+                @if($initialMode === 'edited')
+                    <span class="badge-sci badge-sci-active" id="statusBadge">EDITED PREVIEW (_E)</span>
+                @else
+                    <span class="badge-sci badge-sci-neutral" id="statusBadge">ORIGINAL ACQUISITION</span>
+                @endif
             @else
-                <span class="badge-sci badge-sci-neutral" id="statusBadge">ORIGINAL ACQUISITION</span>
+                <span class="badge-sci badge-sci-neutral" id="statusBadge">ORIGINAL ACQUISITION (UNEDITED)</span>
             @endif
         </div>
-        <h1 class="h3 mb-0 mono">{{ $image->filename }}</h1>
+        <h1 class="h3 mb-0 mono" id="displayedFilename">{{ $initialMode === 'edited' && $image->has_edit ? $image->edited_filename : $image->filename }}</h1>
     </div>
 
     <div class="mt-2 mt-md-0 d-flex gap-2">
         <a href="{{ route('cases.show', ['caseId' => $image->embryoCase->case_id, 'day' => $image->day_number]) }}" class="btn btn-sm btn-sci-secondary">
             &larr; BACK TO CASE
         </a>
-        <a href="{{ route('cases.compare', ['caseId' => $image->embryoCase->case_id, 'image_a' => $image->id]) }}" class="btn btn-sm btn-sci-secondary">
-            COMPARE
-        </a>
+        @if($image->has_edit)
+            <a href="{{ route('cases.compare', ['caseId' => $image->embryoCase->case_id, 'image_a' => $image->id, 'type_a' => 'original', 'image_b' => $image->id, 'type_b' => 'edited']) }}" class="btn btn-sm btn-sci-secondary">
+                COMPARE ORIGINAL VS EDITED
+            </a>
+        @else
+            <a href="{{ route('cases.compare', ['caseId' => $image->embryoCase->case_id, 'image_a' => $image->id]) }}" class="btn btn-sm btn-sci-secondary">
+                COMPARE
+            </a>
+        @endif
         <a href="{{ route('images.editor', $image->id) }}" class="btn btn-sm btn-sci-primary">
-            OPEN ANNOTATION EDITOR &rarr;
+            {{ $image->has_edit ? 'RE-ANNOTATE IN EDITOR &rarr;' : 'OPEN ANNOTATION EDITOR &rarr;' }}
         </a>
     </div>
 </div>
@@ -52,10 +67,10 @@
     <div class="d-flex align-items-center gap-2">
         @if($image->has_edit)
             <div class="btn-group" role="group">
-                <button type="button" class="btn btn-sm btn-sci-secondary" id="showOriginalBtn">
+                <button type="button" class="btn btn-sm {{ $initialMode === 'original' ? 'btn-sci-primary active' : 'btn-sci-secondary' }}" id="showOriginalBtn">
                     ORIGINAL
                 </button>
-                <button type="button" class="btn btn-sm btn-sci-primary" id="showEditedBtn">
+                <button type="button" class="btn btn-sm {{ $initialMode === 'edited' ? 'btn-sci-primary active' : 'btn-sci-secondary' }}" id="showEditedBtn">
                     EDITED (_E)
                 </button>
             </div>
@@ -67,7 +82,7 @@
 
 <!-- Main Viewing Stage -->
 <div class="viewer-workspace" id="viewerStage">
-    <img src="{{ route('images.serve', ['id' => $image->id, 'type' => $image->has_edit ? 'edited' : 'original']) }}"
+    <img src="{{ route('images.serve', ['id' => $image->id, 'type' => $initialMode, 'v' => $image->annotation?->version]) }}"
          alt="Embryo acquisition {{ $image->filename }}"
          id="targetImage"
          class="viewer-canvas"
@@ -78,14 +93,14 @@
 <div class="sci-card mt-3">
     <div class="sci-card-header">
         <span class="sci-card-title">IMAGE SPECIFICATIONS &amp; AUDIT METADATA</span>
-        <span class="mono" style="font-size: 11px;">SHA-256 NON-DESTRUCTIVE TRACEABILITY</span>
+        <span class="mono" style="font-size: 11px;">NON-DESTRUCTIVE CLINICAL STORAGE POLICY</span>
     </div>
     <div class="sci-card-body p-0">
         <div class="row g-0">
             <div class="col-12 col-md-6 border-end" style="border-color: var(--border-grey) !important;">
                 <table class="table-sci mb-0">
                     <tr>
-                        <th style="width: 40%;">Embryo Case ID</th>
+                        <th style="width: 42%;">Embryo Case ID</th>
                         <td class="mono fw-bold">{{ $image->embryoCase->case_id }}</td>
                     </tr>
                     <tr>
@@ -98,7 +113,12 @@
                     </tr>
                     <tr>
                         <th>Image Acquisition Time</th>
-                        <td class="mono fw-bold">{{ $image->capture_time }} (24h UTC)</td>
+                        <td class="mono fw-bold text-black">
+                            {{ $image->capture_time }} (24h UTC)
+                            <div class="text-muted" style="font-size: 10px; font-weight: normal;">
+                                &bull; Maintained identically across Original &amp; Edited versions
+                            </div>
+                        </td>
                     </tr>
                     <tr>
                         <th>Capture Date</th>
@@ -109,24 +129,36 @@
             <div class="col-12 col-md-6">
                 <table class="table-sci mb-0">
                     <tr>
-                        <th style="width: 40%;">Original Filename</th>
-                        <td class="mono">{{ $image->original_name }}</td>
+                        <th style="width: 42%;">Original Raw File</th>
+                        <td class="mono text-black fw-bold">
+                            {{ $image->filename }}
+                            <div class="text-muted" style="font-size: 10px; font-weight: normal;">
+                                Status: Permanent &amp; Untouched
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Edited Layer File</th>
+                        <td class="mono">
+                            @if($image->has_edit)
+                                <span class="text-black fw-bold">{{ $image->edited_filename }}</span>
+                                <span class="badge-sci badge-sci-active" style="font-size: 9px;">ACTIVE</span>
+                            @else
+                                <span class="text-muted">None (Original unannotated)</span>
+                            @endif
+                        </td>
                     </tr>
                     <tr>
                         <th>Image Dimensions</th>
-                        <td class="mono">{{ $image->width ? "{$image->width} × {$image->height} px" : 'Raw Vector / Unspecified' }}</td>
+                        <td class="mono">{{ $image->width ? "{$image->width} × {$image->height} px" : 'Raw Specimen' }}</td>
                     </tr>
                     <tr>
-                        <th>File Size</th>
+                        <th>Original File Size</th>
                         <td class="mono">{{ $image->formatted_file_size }} ({{ number_format($image->file_size) }} bytes)</td>
                     </tr>
                     <tr>
-                        <th>Acquired By</th>
+                        <th>Uploaded By</th>
                         <td>{{ $image->user?->name ?? 'Laboratory User' }}</td>
-                    </tr>
-                    <tr>
-                        <th>Upload Timestamp</th>
-                        <td class="mono">{{ $image->created_at?->format('Y-m-d H:i:s') }}</td>
                     </tr>
                 </table>
             </div>
@@ -134,15 +166,21 @@
 
         @if($image->has_edit && $image->annotation)
             <div class="p-3 border-top" style="border-color: var(--border-grey) !important; background-color: var(--bg-off-white);">
-                <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
                     <div>
-                        <span class="text-secondary-label">ANNOTATION VERSION STATUS:</span>
+                        <span class="text-secondary-label">ANNOTATION VERSION AUDIT:</span>
                         <span class="mono fw-bold ms-1">Version {{ $image->annotation->version }}</span> &bull;
-                        <span class="text-muted">Edited by {{ $image->annotation->user?->name ?? 'Embryologist' }} on {{ $image->annotation->updated_at?->format('Y-m-d H:i') }}</span>
+                        <span class="text-muted">Annotated by {{ $image->annotation->user?->name ?? 'Embryologist' }} on {{ $image->annotation->updated_at?->format('Y-m-d H:i') }}</span> &bull;
+                        <span class="mono" style="font-size: 11px;">Vector JSON: <code>{{ basename($image->annotation_json_path ?? '') }}</code></span>
                     </div>
-                    <a href="{{ route('images.editor', $image->id) }}" class="btn btn-sm btn-sci-secondary">
-                        MODIFY ANNOTATIONS
-                    </a>
+                    <div class="d-flex gap-2">
+                        <a href="{{ route('cases.compare', ['caseId' => $image->embryoCase->case_id, 'image_a' => $image->id, 'type_a' => 'original', 'image_b' => $image->id, 'type_b' => 'edited']) }}" class="btn btn-sm btn-sci-secondary">
+                            COMPARE SIDE-BY-SIDE
+                        </a>
+                        <a href="{{ route('images.editor', $image->id) }}" class="btn btn-sm btn-sci-primary">
+                            MODIFY ANNOTATIONS
+                        </a>
+                    </div>
                 </div>
             </div>
         @endif
@@ -243,24 +281,30 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Toggle Original vs Edited
     if (showOriginalBtn && showEditedBtn) {
+        const originalFilename = "{{ $image->filename }}";
+        const editedFilename = "{{ $image->edited_filename ?? $image->filename }}";
+        const displayedFilename = document.getElementById('displayedFilename');
+
         showOriginalBtn.addEventListener('click', function() {
             img.src = originalUrl;
-            showOriginalBtn.classList.add('btn-sci-primary');
+            showOriginalBtn.classList.add('btn-sci-primary', 'active');
             showOriginalBtn.classList.remove('btn-sci-secondary');
             showEditedBtn.classList.add('btn-sci-secondary');
-            showEditedBtn.classList.remove('btn-sci-primary');
+            showEditedBtn.classList.remove('btn-sci-primary', 'active');
             statusBadge.innerText = 'ORIGINAL ACQUISITION';
             statusBadge.className = 'badge-sci badge-sci-neutral';
+            if (displayedFilename) displayedFilename.innerText = originalFilename;
         });
 
         showEditedBtn.addEventListener('click', function() {
             img.src = editedUrl;
-            showEditedBtn.classList.add('btn-sci-primary');
+            showEditedBtn.classList.add('btn-sci-primary', 'active');
             showEditedBtn.classList.remove('btn-sci-secondary');
             showOriginalBtn.classList.add('btn-sci-secondary');
-            showOriginalBtn.classList.remove('btn-sci-primary');
-            statusBadge.innerText = 'EDITED PREVIEW';
+            showOriginalBtn.classList.remove('btn-sci-primary', 'active');
+            statusBadge.innerText = 'EDITED PREVIEW (_E)';
             statusBadge.className = 'badge-sci badge-sci-active';
+            if (displayedFilename) displayedFilename.innerText = editedFilename;
         });
     }
 });
