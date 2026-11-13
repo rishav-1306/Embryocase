@@ -194,6 +194,137 @@ class EmbryoCaseWorkflowTest extends TestCase
         $viewResponse->assertSee('09-00-00_E.png');
         $viewResponse->assertSee('09:00:00');
         $viewResponse->assertSee('SAME TIME');
+        $viewResponse->assertSee('DELETE EMBRYO');
+    }
+
+    public function test_ayush_embryologist_login_workflow(): void
+    {
+        $ayush = User::create([
+            'name' => 'ayush',
+            'email' => 'rishavsingh.1105@gmail.com',
+            'password' => Hash::make('Ayush@2006'),
+            'role' => 'embryologist',
+            'status' => 'active',
+            'special_key_hash' => Hash::make('RISHAV1306'),
+            'email_verified_at' => now(),
+        ]);
+
+        $response = $this->post('/login', [
+            'name' => 'ayush',
+            'email' => 'rishavsingh.1105@gmail.com',
+            'password' => 'Ayush@2006',
+            'special_key' => 'RISHAV1306',
+        ]);
+
+        $response->assertStatus(302);
+        $response->assertRedirect(route('auth.otp.show'));
+        $this->assertEquals($ayush->id, session('pending_auth')['user_id']);
+    }
+
+    public function test_delete_embryo_image_removes_from_database(): void
+    {
+        $user = User::create([
+            'name' => 'ayush',
+            'email' => 'rishavsingh.1105@gmail.com',
+            'password' => Hash::make('Ayush@2006'),
+            'role' => 'embryologist',
+            'status' => 'active',
+            'special_key_hash' => Hash::make('RISHAV1306'),
+            'email_verified_at' => now(),
+        ]);
+
+        $this->actingAs($user);
+
+        $case = EmbryoCase::create([
+            'case_id' => 'EMB-2026-0005',
+            'embryo_number' => 'E-005',
+            'father_name' => 'Father',
+            'mother_name' => 'Mother',
+            'collection_date' => '2026-11-01',
+            'collection_time' => '09:00:00',
+            'total_days' => 6,
+            'status' => 'in_progress',
+            'user_id' => $user->id,
+        ]);
+
+        $fakeOriginal = UploadedFile::fake()->image('10-00-00.png', 300, 300);
+        $storagePath = "private/embryos/{$case->case_id}/Day_1/10-00-00.png";
+        Storage::disk('local')->putFileAs("private/embryos/{$case->case_id}/Day_1", $fakeOriginal, '10-00-00.png');
+
+        $image = EmbryoImage::create([
+            'case_id' => $case->id,
+            'user_id' => $user->id,
+            'day_number' => 1,
+            'filename' => '10-00-00.png',
+            'original_name' => '10-00-00.png',
+            'storage_path' => $storagePath,
+            'capture_time' => '10:00:00',
+            'file_size' => 1024,
+            'mime_type' => 'image/png',
+            'has_edit' => false,
+        ]);
+
+        $this->assertDatabaseHas('embryo_images', ['id' => $image->id]);
+
+        $deleteResponse = $this->delete(route('images.destroy', $image->id));
+        $deleteResponse->assertStatus(302);
+
+        $this->assertSoftDeleted('embryo_images', ['id' => $image->id]);
+        $this->assertFalse(Storage::disk('local')->exists($storagePath));
+    }
+
+    public function test_delete_day_option_removes_day_and_decrements_total_days(): void
+    {
+        $admin = User::create([
+            'name' => 'System Admin',
+            'email' => 'admin.test@embryocase.lab',
+            'password' => Hash::make('AdminPass123!'),
+            'role' => 'admin',
+            'status' => 'active',
+            'email_verified_at' => now(),
+        ]);
+
+        $this->actingAs($admin);
+
+        $case = EmbryoCase::create([
+            'case_id' => 'EMB-2026-0006',
+            'embryo_number' => 'E-006',
+            'father_name' => 'Father',
+            'mother_name' => 'Mother',
+            'collection_date' => '2026-11-01',
+            'collection_time' => '09:00:00',
+            'total_days' => 6,
+            'status' => 'in_progress',
+            'user_id' => $admin->id,
+        ]);
+
+        // Add an image on Day 6
+        $fakeImg = UploadedFile::fake()->image('11-00-00.png', 200, 200);
+        $path = "private/embryos/{$case->case_id}/Day_6/11-00-00.png";
+        Storage::disk('local')->putFileAs("private/embryos/{$case->case_id}/Day_6", $fakeImg, '11-00-00.png');
+
+        $img = EmbryoImage::create([
+            'case_id' => $case->id,
+            'user_id' => $admin->id,
+            'day_number' => 6,
+            'filename' => '11-00-00.png',
+            'original_name' => '11-00-00.png',
+            'storage_path' => $path,
+            'capture_time' => '11:00:00',
+            'file_size' => 512,
+            'mime_type' => 'image/png',
+            'has_edit' => false,
+        ]);
+
+        $this->assertEquals(6, $case->fresh()->total_days);
+
+        $response = $this->delete(route('cases.delete-day', $case->case_id), [
+            'day_number' => 6,
+        ]);
+
+        $response->assertStatus(302);
+        $this->assertEquals(5, $case->fresh()->total_days);
+        $this->assertSoftDeleted('embryo_images', ['id' => $img->id]);
     }
 }
 

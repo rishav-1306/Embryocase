@@ -229,6 +229,83 @@ class EmbryoCaseController extends Controller
     }
 
     /**
+     * Delete a development day and all associated embryo microscopy images
+     */
+    public function deleteDay(Request $request, $caseId)
+    {
+        $case = EmbryoCase::where('case_id', $caseId)->firstOrFail();
+        $user = Auth::user();
+        if ($user->isEmbryologist() && $case->user_id !== $user->id) {
+            abort(403, 'Unauthorized access.');
+        }
+
+        if ($case->total_days <= 1) {
+            return back()->withErrors(['error' => 'An embryo case must contain at least Day 1. Cannot delete the only remaining day.']);
+        }
+
+        $targetDay = intval($request->input('day_number', $case->total_days));
+        if ($targetDay < 1 || $targetDay > $case->total_days) {
+            $targetDay = $case->total_days;
+        }
+
+        // 1. Delete all images belonging to this case for $targetDay
+        $imagesToDelete = $case->images()->where('day_number', $targetDay)->get();
+        $disk = $this->storageService->getPrivateDisk();
+
+        foreach ($imagesToDelete as $img) {
+            if ($img->storage_path && $disk->exists($img->storage_path)) {
+                $disk->delete($img->storage_path);
+            }
+            if ($img->edited_storage_path && $disk->exists($img->edited_storage_path)) {
+                $disk->delete($img->edited_storage_path);
+            }
+            if ($img->annotation_json_path && $disk->exists($img->annotation_json_path)) {
+                $disk->delete($img->annotation_json_path);
+            }
+            if ($img->annotation) {
+                $img->annotation->versions()->delete();
+                $img->annotation->delete();
+            }
+            $img->delete();
+        }
+
+        // 2. Delete storage day directory
+        $dayDir = "private/embryos/{$case->case_id}/Day_{$targetDay}";
+        if ($disk->exists($dayDir)) {
+            $disk->deleteDirectory($dayDir);
+        }
+
+        // 3. If targetDay < total_days, shift subsequent days down by 1
+        if ($targetDay < $case->total_days) {
+            for ($d = $targetDay + 1; $d <= $case->total_days; $d++) {
+                $newD = $d - 1;
+                $case->images()->where('day_number', $d)->update(['day_number' => $newD]);
+
+                $oldDir = "private/embryos/{$case->case_id}/Day_{$d}";
+                $newDir = "private/embryos/{$case->case_id}/Day_{$newD}";
+                if ($disk->exists($oldDir)) {
+                    @rename($disk->path($oldDir), $disk->path($newDir));
+                }
+            }
+        }
+
+        // 4. Decrement total_days
+        $newTotalDays = $case->total_days - 1;
+        $case->update(['total_days' => $newTotalDays]);
+
+        ActivityLog::record($user->id, 'case_day_deleted', $case->case_id, [
+            'deleted_day' => $targetDay,
+            'new_total_days' => $newTotalDays,
+            'deleted_images_count' => $imagesToDelete->count(),
+        ]);
+
+        $nextActiveDay = min($targetDay, $newTotalDays);
+
+        return redirect()->route('cases.show', ['caseId' => $case->case_id, 'day' => $nextActiveDay])
+            ->with('status', "Day {$targetDay} and all associated embryo images have been successfully deleted.");
+    }
+
+    /**
      * Export embryo case to ZIP archive
      */
     public function export($caseId)

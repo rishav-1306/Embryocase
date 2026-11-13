@@ -72,6 +72,7 @@ Route::middleware(['embryologist'])->group(function () {
     Route::get('/cases/{caseId}/edit', [EmbryoCaseController::class, 'edit'])->name('cases.edit');
     Route::put('/cases/{caseId}', [EmbryoCaseController::class, 'update'])->name('cases.update');
     Route::post('/cases/{caseId}/add-day', [EmbryoCaseController::class, 'addDay'])->name('cases.add-day');
+    Route::delete('/cases/{caseId}/delete-day', [EmbryoCaseController::class, 'deleteDay'])->name('cases.delete-day');
     Route::get('/cases/{caseId}/export', [EmbryoCaseController::class, 'export'])->name('cases.export');
 
     // Images & Uploads
@@ -81,6 +82,7 @@ Route::middleware(['embryologist'])->group(function () {
     Route::get('/images/{id}/editor', [EmbryoImageController::class, 'editor'])->name('images.editor');
     Route::post('/images/{id}/annotations', [EmbryoImageController::class, 'saveAnnotation'])->name('images.annotations.save');
     Route::delete('/images/{id}', [EmbryoImageController::class, 'destroy'])->name('images.destroy');
+    Route::delete('/images/{id}/edit', [EmbryoImageController::class, 'destroyEdit'])->name('images.destroy-edit');
 
     // Comparison & Observations
     Route::get('/cases/{caseId}/compare', [ImageComparisonController::class, 'compare'])->name('cases.compare');

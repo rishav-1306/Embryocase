@@ -93,9 +93,21 @@
                                 @endif
                             </span>
                         </div>
-                        <span class="mono text-muted" style="font-size: 12px;">
-                            {{ $dayImgs->count() }} Original(s) &bull; {{ $editedCount }} Edited Version(s)
-                        </span>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="mono text-muted" style="font-size: 12px;">
+                                {{ $dayImgs->count() }} Original(s) &bull; {{ $editedCount }} Edited Version(s)
+                            </span>
+                            @if($case->total_days > 1)
+                                <form method="POST" action="{{ route('cases.delete-day', $case->case_id) }}" class="d-inline m-0" onsubmit="return confirm('Are you sure you want to delete DAY {{ $d }} and all its images? This cannot be undone.');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <input type="hidden" name="day_number" value="{{ $d }}">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger py-0 px-2" style="font-size: 11px;" title="Delete Day {{ $d }}">
+                                        &times; DELETE DAY {{ $d }}
+                                    </button>
+                                </form>
+                            @endif
+                        </div>
                     </div>
 
                     @if($dayImgs->count() > 0)
@@ -119,7 +131,16 @@
                                     </div>
                                     <div class="embryo-card-info">
                                         <div class="d-flex justify-content-between align-items-center mb-1">
-                                            <span class="embryo-time mono" title="Acquisition Time">{{ $img->capture_time }}</span>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <span class="embryo-time mono" title="Acquisition Time">{{ $img->capture_time }}</span>
+                                                <form method="POST" action="{{ route('images.destroy', $img->id) }}" class="d-inline m-0 p-0" onsubmit="return confirm('Are you sure you want to delete this embryo image ({{ $img->filename }})? This action cannot be undone.');">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-sm btn-link text-danger p-0 border-0" title="Delete Embryo Image" style="font-size: 11px; text-decoration: underline; font-weight: 600;">
+                                                        &times; DELETE EMBRYO
+                                                    </button>
+                                                </form>
+                                            </div>
                                             <span class="text-muted mono" style="font-size: 11px;">{{ $img->formatted_file_size }}</span>
                                         </div>
                                         <div class="text-muted mono mb-1" style="font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="{{ $img->filename }}">
@@ -156,7 +177,16 @@
                                         </div>
                                         <div class="embryo-card-info" style="background-color: var(--bg-off-white);">
                                             <div class="d-flex justify-content-between align-items-center mb-1">
-                                                <span class="embryo-time mono text-black fw-bold" title="Acquisition Time (Exact same as original)">{{ $img->capture_time }}</span>
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <span class="embryo-time mono text-black fw-bold" title="Acquisition Time (Exact same as original)">{{ $img->capture_time }}</span>
+                                                    <form method="POST" action="{{ route('images.destroy-edit', $img->id) }}" class="d-inline m-0 p-0" onsubmit="return confirm('Are you sure you want to delete this edited annotation layer (_E)? The raw original embryo image will remain preserved.');">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="btn btn-sm btn-link text-danger p-0 border-0" title="Delete Edited Embryo Version" style="font-size: 11px; text-decoration: underline; font-weight: 600;">
+                                                            &times; DELETE EMBRYO
+                                                        </button>
+                                                    </form>
+                                                </div>
                                                 <span class="badge-sci badge-sci-neutral mono" style="font-size: 9px; padding: 2px 4px;">SAME TIME</span>
                                             </div>
                                             <div class="text-muted mono mb-1" style="font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="{{ $img->edited_filename }}">
@@ -345,6 +375,16 @@
                             + ADD DAY
                         </button>
                     </form>
+                    @if($case->total_days > 1)
+                        <form method="POST" action="{{ route('cases.delete-day', $case->case_id) }}" class="m-0 align-self-center ps-1" onsubmit="return confirm('Are you sure you want to delete DAY {{ $activeDay }} and all its associated embryo images? This action cannot be undone.');">
+                            @csrf
+                            @method('DELETE')
+                            <input type="hidden" name="day_number" value="{{ $activeDay }}">
+                            <button type="submit" class="btn btn-sm btn-outline-danger py-1 px-2" title="Delete Day {{ $activeDay }}">
+                                &times; DELETE DAY {{ $activeDay }}
+                            </button>
+                        </form>
+                    @endif
                 </div>
 
                 <!-- Active Day Action Bar -->
@@ -377,6 +417,16 @@
                         <button type="button" class="btn btn-sm btn-sci-primary" data-bs-toggle="modal" data-bs-target="#uploadModal">
                             + UPLOAD TO DAY {{ $activeDay }}
                         </button>
+                        @if($case->total_days > 1)
+                            <form method="POST" action="{{ route('cases.delete-day', $case->case_id) }}" class="m-0 d-inline" onsubmit="return confirm('Are you sure you want to delete DAY {{ $activeDay }} and all its associated embryo images? This action cannot be undone.');">
+                                @csrf
+                                @method('DELETE')
+                                <input type="hidden" name="day_number" value="{{ $activeDay }}">
+                                <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete Day {{ $activeDay }}">
+                                    &times; DELETE DAY {{ $activeDay }}
+                                </button>
+                            </form>
+                        @endif
                     </div>
                 </div>
 
@@ -403,7 +453,16 @@
                                     </div>
                                     <div class="embryo-card-info">
                                         <div class="d-flex justify-content-between align-items-center mb-1">
-                                            <span class="embryo-time mono" title="Acquisition Time">{{ $img->capture_time }}</span>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <span class="embryo-time mono" title="Acquisition Time">{{ $img->capture_time }}</span>
+                                                <form method="POST" action="{{ route('images.destroy', $img->id) }}" class="d-inline m-0 p-0" onsubmit="return confirm('Are you sure you want to delete this embryo image ({{ $img->filename }})? This action cannot be undone.');">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-sm btn-link text-danger p-0 border-0" title="Delete Embryo Image" style="font-size: 11px; text-decoration: underline; font-weight: 600;">
+                                                        &times; DELETE EMBRYO
+                                                    </button>
+                                                </form>
+                                            </div>
                                             <span class="text-muted mono" style="font-size: 11px;">{{ $img->formatted_file_size }}</span>
                                         </div>
                                         <div class="text-muted mono mb-1" style="font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="{{ $img->filename }}">
@@ -440,7 +499,16 @@
                                         </div>
                                         <div class="embryo-card-info" style="background-color: var(--bg-off-white);">
                                             <div class="d-flex justify-content-between align-items-center mb-1">
-                                                <span class="embryo-time mono text-black fw-bold" title="Acquisition Time (Identical to original)">{{ $img->capture_time }}</span>
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <span class="embryo-time mono text-black fw-bold" title="Acquisition Time (Identical to original)">{{ $img->capture_time }}</span>
+                                                    <form method="POST" action="{{ route('images.destroy-edit', $img->id) }}" class="d-inline m-0 p-0" onsubmit="return confirm('Are you sure you want to delete this edited annotation layer (_E)? The raw original embryo image will remain preserved.');">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="btn btn-sm btn-link text-danger p-0 border-0" title="Delete Edited Embryo Version" style="font-size: 11px; text-decoration: underline; font-weight: 600;">
+                                                            &times; DELETE EMBRYO
+                                                        </button>
+                                                    </form>
+                                                </div>
                                                 <span class="badge-sci badge-sci-neutral mono" style="font-size: 9px; padding: 2px 4px;">SAME TIME</span>
                                             </div>
                                             <div class="text-muted mono mb-1" style="font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="{{ $img->edited_filename }}">

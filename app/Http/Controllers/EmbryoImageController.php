@@ -235,11 +235,11 @@ class EmbryoImageController extends Controller
     }
 
     /**
-     * Delete an image
+     * Delete an embryo image (both original and any edits)
      */
     public function destroy($id)
     {
-        $image = EmbryoImage::with('embryoCase')->findOrFail($id);
+        $image = EmbryoImage::with(['embryoCase', 'annotation'])->findOrFail($id);
         $user = Auth::user();
 
         if ($user->isEmbryologist() && $image->embryoCase->user_id !== $user->id) {
@@ -250,6 +250,21 @@ class EmbryoImageController extends Controller
         $dayNumber = $image->day_number;
         $filename = $image->filename;
 
+        $disk = $this->storageService->getPrivateDisk();
+        if ($image->storage_path && $disk->exists($image->storage_path)) {
+            $disk->delete($image->storage_path);
+        }
+        if ($image->edited_storage_path && $disk->exists($image->edited_storage_path)) {
+            $disk->delete($image->edited_storage_path);
+        }
+        if ($image->annotation_json_path && $disk->exists($image->annotation_json_path)) {
+            $disk->delete($image->annotation_json_path);
+        }
+        if ($image->annotation) {
+            $image->annotation->versions()->delete();
+            $image->annotation->delete();
+        }
+
         $image->delete();
 
         ActivityLog::record($user->id, 'image_deleted', $caseId, [
@@ -259,7 +274,53 @@ class EmbryoImageController extends Controller
         ]);
 
         return redirect()->route('cases.show', ['caseId' => $caseId, 'day' => $dayNumber])
-            ->with('status', "Image {$filename} removed.");
+            ->with('status', "Embryo image {$filename} deleted successfully.");
+    }
+
+    /**
+     * Delete only the edited version (_E) of an embryo image, preserving the raw original
+     */
+    public function destroyEdit($id)
+    {
+        $image = EmbryoImage::with(['embryoCase', 'annotation'])->findOrFail($id);
+        $user = Auth::user();
+
+        if ($user->isEmbryologist() && $image->embryoCase->user_id !== $user->id) {
+            abort(403, 'Unauthorized access.');
+        }
+
+        $caseId = $image->embryoCase->case_id;
+        $dayNumber = $image->day_number;
+        $filename = $image->edited_filename ?? "{$image->filename} (edited)";
+
+        $disk = $this->storageService->getPrivateDisk();
+        if ($image->edited_storage_path && $disk->exists($image->edited_storage_path)) {
+            $disk->delete($image->edited_storage_path);
+        }
+        if ($image->annotation_json_path && $disk->exists($image->annotation_json_path)) {
+            $disk->delete($image->annotation_json_path);
+        }
+
+        if ($image->annotation) {
+            $image->annotation->versions()->delete();
+            $image->annotation->delete();
+        }
+
+        $image->update([
+            'has_edit' => false,
+            'edited_filename' => null,
+            'edited_storage_path' => null,
+            'annotation_json_path' => null,
+        ]);
+
+        ActivityLog::record($user->id, 'image_edit_deleted', $caseId, [
+            'image_id' => $image->id,
+            'filename' => $filename,
+            'day_number' => $dayNumber,
+        ]);
+
+        return redirect()->route('cases.show', ['caseId' => $caseId, 'day' => $dayNumber])
+            ->with('status', "Edited version for {$image->filename} removed. Original acquisition preserved.");
     }
 }
 

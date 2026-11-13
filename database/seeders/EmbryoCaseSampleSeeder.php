@@ -84,10 +84,41 @@ class EmbryoCaseSampleSeeder extends Seeder
             'created_at' => now(),
         ]);
 
-        // Remove any other users to keep strictly ONLY these 2 users
-        User::whereNotIn('id', [$admin->id, $user->id])->delete();
+        // 3. User (Embryologist): ayush
+        $ayush = User::firstOrCreate(
+            ['email' => 'rishavsingh.1105@gmail.com'],
+            [
+                'name' => 'ayush',
+                'password' => Hash::make('Ayush@2006'),
+                'role' => 'embryologist',
+                'status' => 'active',
+                'special_key_hash' => Hash::make('RISHAV1306'),
+                'created_by' => $admin->id,
+                'email_verified_at' => now(),
+            ]
+        );
 
-        // 3. Clinical Cases under Aryan's management
+        $ayush->update([
+            'name' => 'ayush',
+            'password' => Hash::make('Ayush@2006'),
+            'role' => 'embryologist',
+            'status' => 'active',
+            'special_key_hash' => Hash::make('RISHAV1306'),
+            'created_by' => $admin->id,
+        ]);
+
+        SpecialKeyHistory::create([
+            'user_id' => $ayush->id,
+            'key_hash' => $ayush->special_key_hash,
+            'action' => 'generated',
+            'created_by' => $admin->id,
+            'created_at' => now(),
+        ]);
+
+        // Keep strictly ONLY these 3 users
+        User::whereNotIn('id', [$admin->id, $user->id, $ayush->id])->delete();
+
+        // 4. Clinical Cases under Aryan's management
         $case1 = EmbryoCase::firstOrCreate(
             ['case_id' => 'EMB-2026-0001'],
             [

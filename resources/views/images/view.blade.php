@@ -43,6 +43,13 @@
         <a href="{{ route('images.editor', $image->id) }}" class="btn btn-sm btn-sci-primary">
             {{ $image->has_edit ? 'RE-ANNOTATE IN EDITOR &rarr;' : 'OPEN ANNOTATION EDITOR &rarr;' }}
         </a>
+        <form method="POST" action="{{ route('images.destroy', $image->id) }}" class="d-inline m-0" onsubmit="return confirm('Are you sure you want to permanently delete this embryo image ({{ $image->filename }})? This action cannot be undone.');">
+            @csrf
+            @method('DELETE')
+            <button type="submit" class="btn btn-sm btn-outline-danger">
+                &times; DELETE EMBRYO
+            </button>
+        </form>
     </div>
 </div>
 
