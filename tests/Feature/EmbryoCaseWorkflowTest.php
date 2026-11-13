@@ -69,11 +69,12 @@ class EmbryoCaseWorkflowTest extends TestCase
             'email_verified_at' => now(),
         ]);
 
-        // Step 1: Initial load shows Step 1 Name input
+        // Step 1: Initial load shows Step 1 Name input, hides next steps
         $step1Get = $this->get('/login');
         $step1Get->assertStatus(200);
-        $step1Get->assertSee('Step 1: Enter Your Full Name');
-        $step1Get->assertDontSee('Step 2: Enter Secret Key');
+        $step1Get->assertSee('Full Name');
+        $step1Get->assertDontSee('Secret Key');
+        $step1Get->assertDontSee('Registered Email Address');
 
         // Step 1: Invalid Name
         $step1Fail = $this->post('/login', [
@@ -91,12 +92,12 @@ class EmbryoCaseWorkflowTest extends TestCase
         $this->assertEquals(2, session('embryo_auth_step'));
         $this->assertEquals('Aryan', session('embryo_auth_name'));
 
-        // Step 2: Renders Step 2 Secret Key input
+        // Step 2: Renders Step 2 Secret Key input, hides email step
         $step2Get = $this->get('/login');
         $step2Get->assertStatus(200);
-        $step2Get->assertSee('Step 2: Enter Secret Key');
+        $step2Get->assertSee('Secret Key');
         $step2Get->assertSee('Aryan');
-        $step2Get->assertDontSee('Step 1: Enter Your Full Name');
+        $step2Get->assertDontSee('Registered Email Address');
 
         // Step 2: Invalid Secret Key
         $step2Fail = $this->post('/login', [
@@ -117,8 +118,8 @@ class EmbryoCaseWorkflowTest extends TestCase
         // Step 3: Renders Step 3 Email input
         $step3Get = $this->get('/login');
         $step3Get->assertStatus(200);
-        $step3Get->assertSee('Step 3: Enter Registered Email');
-        $step3Get->assertSee('KEY VERIFIED');
+        $step3Get->assertSee('Registered Email Address');
+        $step3Get->assertSee('Aryan');
 
         // Step 3: Invalid Email
         $step3Fail = $this->post('/login', [
