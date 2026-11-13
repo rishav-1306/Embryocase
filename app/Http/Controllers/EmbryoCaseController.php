@@ -146,7 +146,12 @@ class EmbryoCaseController extends Controller
 
         $dayImages = $case->images->where('day_number', $activeDay);
 
-        return view('cases.show', compact('case', 'viewMode', 'activeDay', 'dayImages'));
+        app(EmbryoImageController::class)->purgeExpiredTrash();
+        $trashedImages = $case->trashedImages24h()->get();
+        $isTodayMissing = $case->isTodayImageMissing();
+        $todayDay = $case->today_development_day;
+
+        return view('cases.show', compact('case', 'viewMode', 'activeDay', 'dayImages', 'trashedImages', 'isTodayMissing', 'todayDay'));
     }
 
     /**

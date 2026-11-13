@@ -28,13 +28,16 @@ class AdminDashboardController extends Controller
             ->take(10)
             ->get();
 
+        $pendingTodayCases = EmbryoCase::getCasesWithMissingTodayImage();
+
         return view('admin.dashboard', compact(
             'totalCases',
             'totalEmbryologists',
             'totalImages',
             'totalEditedImages',
             'recentCases',
-            'recentActivities'
+            'recentActivities',
+            'pendingTodayCases'
         ));
     }
 }

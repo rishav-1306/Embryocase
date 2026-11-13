@@ -83,6 +83,8 @@ Route::middleware(['embryologist'])->group(function () {
     Route::post('/images/{id}/annotations', [EmbryoImageController::class, 'saveAnnotation'])->name('images.annotations.save');
     Route::delete('/images/{id}', [EmbryoImageController::class, 'destroy'])->name('images.destroy');
     Route::delete('/images/{id}/edit', [EmbryoImageController::class, 'destroyEdit'])->name('images.destroy-edit');
+    Route::post('/images/{id}/restore', [EmbryoImageController::class, 'restore'])->name('images.restore');
+    Route::delete('/images/{id}/force', [EmbryoImageController::class, 'forceDelete'])->name('images.force-delete');
 
     // Comparison & Observations
     Route::get('/cases/{caseId}/compare', [ImageComparisonController::class, 'compare'])->name('cases.compare');

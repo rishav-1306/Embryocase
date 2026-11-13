@@ -18,6 +18,54 @@
     </div>
 </div>
 
+@if(isset($pendingTodayCases) && $pendingTodayCases->count() > 0)
+    <div class="alert-sci mb-4 p-3" style="background-color: #FFFBE6; border: 1px solid #000; border-left: 6px solid #D9381E;">
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
+            <div class="d-flex align-items-center gap-2">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#D9381E" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h20.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                <strong style="color: #000; font-size: 14px; letter-spacing: 0.5px;">CENTRAL ALERT: TODAY'S EMBRYO ACQUISITION IMAGES MISSING</strong>
+            </div>
+            <span class="badge-sci badge-sci-active mono" style="font-size: 11px;">{{ $pendingTodayCases->count() }} ACTIVE PENDING CASE(S)</span>
+        </div>
+        <p class="text-dark mb-2" style="font-size: 13px;">
+            The following active laboratory embryo cases are scheduled for observation today, but <strong>no microscopy photograph has been uploaded yet for today</strong>:
+        </p>
+        <div class="table-responsive">
+            <table class="table-sci mb-0" style="background-color: #fff;">
+                <thead>
+                    <tr>
+                        <th>Embryo Number</th>
+                        <th>Internal Case ID</th>
+                        <th>Assigned Embryologist</th>
+                        <th>Today's Scheduled Stage</th>
+                        <th>Collection Date</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($pendingTodayCases as $pCase)
+                        <tr>
+                            <td class="mono fw-bold">{{ $pCase->embryo_number }}</td>
+                            <td class="mono">{{ $pCase->case_id }}</td>
+                            <td>{{ $pCase->user?->name ?? 'Unassigned' }}</td>
+                            <td>
+                                <span class="badge bg-danger text-white mono" style="font-size: 11px;">DAY {{ $pCase->today_development_day }}</span>
+                                <span class="text-muted ms-1" style="font-size: 11px;">(Today)</span>
+                            </td>
+                            <td class="mono">{{ $pCase->collection_date?->format('Y-m-d') }}</td>
+                            <td>
+                                <a href="{{ route('cases.show', ['caseId' => $pCase->case_id, 'day' => $pCase->today_development_day]) }}" class="btn btn-sm btn-sci-primary py-0 px-2" style="font-size: 11px;">
+                                    OPEN CASE &rarr;
+                                </a>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    </div>
+@endif
+
 <!-- Scientific Real Statistics Cards -->
 <div class="row g-3 mb-4">
     <div class="col-6 col-lg-3">

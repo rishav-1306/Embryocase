@@ -89,11 +89,11 @@ class EmbryoImageController extends Controller
     }
 
     /**
-     * Authenticated and authorized private image stream
+     * Authenticated and authorized private image stream (supports active and 24h trashed images)
      */
     public function serve(Request $request, $id)
     {
-        $image = EmbryoImage::with('embryoCase')->findOrFail($id);
+        $image = EmbryoImage::withTrashed()->with('embryoCase')->findOrFail($id);
         $user = Auth::user();
 
         if ($user->isEmbryologist() && $image->embryoCase->user_id !== $user->id) {
@@ -235,11 +235,11 @@ class EmbryoImageController extends Controller
     }
 
     /**
-     * Delete an embryo image (both original and any edits)
+     * Move an embryo image to the 24-hour Trash Bin (non-destructive soft delete)
      */
     public function destroy($id)
     {
-        $image = EmbryoImage::with(['embryoCase', 'annotation'])->findOrFail($id);
+        $image = EmbryoImage::with('embryoCase')->findOrFail($id);
         $user = Auth::user();
 
         if ($user->isEmbryologist() && $image->embryoCase->user_id !== $user->id) {
@@ -250,31 +250,76 @@ class EmbryoImageController extends Controller
         $dayNumber = $image->day_number;
         $filename = $image->filename;
 
-        $disk = $this->storageService->getPrivateDisk();
-        if ($image->storage_path && $disk->exists($image->storage_path)) {
-            $disk->delete($image->storage_path);
-        }
-        if ($image->edited_storage_path && $disk->exists($image->edited_storage_path)) {
-            $disk->delete($image->edited_storage_path);
-        }
-        if ($image->annotation_json_path && $disk->exists($image->annotation_json_path)) {
-            $disk->delete($image->annotation_json_path);
-        }
-        if ($image->annotation) {
-            $image->annotation->versions()->delete();
-            $image->annotation->delete();
-        }
-
+        // Soft delete the image: files remain safe in storage for 24h
         $image->delete();
 
-        ActivityLog::record($user->id, 'image_deleted', $caseId, [
+        ActivityLog::record($user->id, 'image_trashed', $caseId, [
             'image_id' => $image->id,
+            'filename' => $filename,
+            'day_number' => $dayNumber,
+            'retention_hours' => 24,
+        ]);
+
+        return redirect()->route('cases.show', ['caseId' => $caseId, 'day' => $dayNumber])
+            ->with('status', "Embryo image {$filename} moved to Trash. It is retained for 24 hours and can be restored.");
+    }
+
+    /**
+     * Restore an embryo image from the 24-hour Trash Bin
+     */
+    public function restore($id)
+    {
+        $this->purgeExpiredTrash();
+
+        $image = EmbryoImage::onlyTrashed()->with('embryoCase')->findOrFail($id);
+        $user = Auth::user();
+
+        if ($user->isEmbryologist() && $image->embryoCase->user_id !== $user->id) {
+            abort(403, 'Unauthorized access.');
+        }
+
+        if ($image->deleted_at < now()->subHours(24)) {
+            $this->permanentlyDeleteImage($image);
+            return back()->withErrors(['error' => 'This embryo image has exceeded the 24-hour retention period and has been permanently purged.']);
+        }
+
+        $image->restore();
+
+        ActivityLog::record($user->id, 'image_restored', $image->embryoCase->case_id, [
+            'image_id' => $image->id,
+            'filename' => $image->filename,
+            'day_number' => $image->day_number,
+        ]);
+
+        return redirect()->route('cases.show', ['caseId' => $image->embryoCase->case_id, 'day' => $image->day_number])
+            ->with('status', "Embryo image {$image->filename} successfully restored from Trash.");
+    }
+
+    /**
+     * Permanently delete an embryo image from the Trash Bin
+     */
+    public function forceDelete($id)
+    {
+        $image = EmbryoImage::onlyTrashed()->with(['embryoCase', 'annotation'])->findOrFail($id);
+        $user = Auth::user();
+
+        if ($user->isEmbryologist() && $image->embryoCase->user_id !== $user->id) {
+            abort(403, 'Unauthorized access.');
+        }
+
+        $caseId = $image->embryoCase->case_id;
+        $filename = $image->filename;
+        $dayNumber = $image->day_number;
+
+        $this->permanentlyDeleteImage($image);
+
+        ActivityLog::record($user->id, 'image_permanently_deleted', $caseId, [
             'filename' => $filename,
             'day_number' => $dayNumber,
         ]);
 
         return redirect()->route('cases.show', ['caseId' => $caseId, 'day' => $dayNumber])
-            ->with('status', "Embryo image {$filename} deleted successfully.");
+            ->with('status', "Embryo image {$filename} permanently deleted from laboratory storage.");
     }
 
     /**
@@ -321,6 +366,43 @@ class EmbryoImageController extends Controller
 
         return redirect()->route('cases.show', ['caseId' => $caseId, 'day' => $dayNumber])
             ->with('status', "Edited version for {$image->filename} removed. Original acquisition preserved.");
+    }
+
+    /**
+     * Clean up physical files and force delete an EmbryoImage record
+     */
+    protected function permanentlyDeleteImage(EmbryoImage $image): void
+    {
+        $disk = $this->storageService->getPrivateDisk();
+        if ($image->storage_path && $disk->exists($image->storage_path)) {
+            $disk->delete($image->storage_path);
+        }
+        if ($image->edited_storage_path && $disk->exists($image->edited_storage_path)) {
+            $disk->delete($image->edited_storage_path);
+        }
+        if ($image->annotation_json_path && $disk->exists($image->annotation_json_path)) {
+            $disk->delete($image->annotation_json_path);
+        }
+        if ($image->annotation) {
+            $image->annotation->versions()->delete();
+            $image->annotation->delete();
+        }
+
+        $image->forceDelete();
+    }
+
+    /**
+     * Purge all trashed images older than 24 hours
+     */
+    public function purgeExpiredTrash(): void
+    {
+        $expired = EmbryoImage::onlyTrashed()
+            ->where('deleted_at', '<', now()->subHours(24))
+            ->get();
+
+        foreach ($expired as $img) {
+            $this->permanentlyDeleteImage($img);
+        }
     }
 }
 

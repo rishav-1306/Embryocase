@@ -50,11 +50,33 @@
             EDIT METADATA
         </a>
 
+        <button type="button" class="btn btn-sm btn-sci-subtle" data-bs-toggle="modal" data-bs-target="#trashModal" title="View 24-Hour Quarantine Trash Bin">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: -2px;"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+            TRASH ({{ $trashedImages->count() }})
+        </button>
+
         <button type="button" class="btn btn-sm btn-sci-primary" data-bs-toggle="modal" data-bs-target="#uploadModal">
             + UPLOAD IMAGES
         </button>
     </div>
 </div>
+
+@if(isset($isTodayMissing) && $isTodayMissing && isset($todayDay))
+    <div class="alert-sci mb-4 p-3 d-flex flex-wrap justify-content-between align-items-center gap-2" style="background-color: #FFFBE6; border: 1px solid #000; border-left: 6px solid #D9381E;">
+        <div>
+            <div class="d-flex align-items-center gap-2">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#D9381E" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h20.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                <strong style="font-size: 14px; letter-spacing: 0.5px; color: #000;">SCHEDULE WARNING: TODAY'S ACQUISITION IMAGE IS NOT UPLOADED (DAY {{ $todayDay }})</strong>
+            </div>
+            <div class="text-dark mt-1" style="font-size: 13px;">
+                According to the collection date ({{ $case->collection_date?->format('Y-m-d') }}), today is <strong>Day {{ $todayDay }}</strong> for Embryo #{{ $case->embryo_number }}. Please record and upload today's microscopy specimen.
+            </div>
+        </div>
+        <button type="button" class="btn btn-sm btn-sci-primary px-3" data-bs-toggle="modal" data-bs-target="#uploadModal">
+            + UPLOAD DAY {{ $todayDay }} IMAGE NOW &rarr;
+        </button>
+    </div>
+@endif
 
 @if($viewMode === 'timeline')
     <!-- ==================== TIMELINE VIEW ==================== -->
@@ -133,11 +155,16 @@
                                         <div class="d-flex justify-content-between align-items-center mb-1">
                                             <div class="d-flex align-items-center gap-2">
                                                 <span class="embryo-time mono" title="Acquisition Time">{{ $img->capture_time }}</span>
-                                                <form method="POST" action="{{ route('images.destroy', $img->id) }}" class="d-inline m-0 p-0" onsubmit="return confirm('Are you sure you want to delete this embryo image ({{ $img->filename }})? This action cannot be undone.');">
+                                                <form method="POST" action="{{ route('images.destroy', $img->id) }}" class="d-inline m-0 p-0" onsubmit="return confirm('Move embryo image {{ $img->filename }} to Trash? It will be retained for 24 hours and can be restored.');">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" class="btn btn-sm btn-link text-danger p-0 border-0" title="Delete Embryo Image" style="font-size: 11px; text-decoration: underline; font-weight: 600;">
-                                                        &times; DELETE EMBRYO
+                                                    <button type="submit" class="btn btn-sm btn-link text-danger p-0 border-0" title="Delete Embryo Image (Move to 24h Trash)" style="line-height: 1;">
+                                                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-danger" style="vertical-align: -2px;">
+                                                            <polyline points="3 6 5 6 21 6"></polyline>
+                                                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                                            <line x1="10" y1="11" x2="10" y2="17"></line>
+                                                            <line x1="14" y1="11" x2="14" y2="17"></line>
+                                                        </svg>
                                                     </button>
                                                 </form>
                                             </div>
@@ -179,11 +206,16 @@
                                             <div class="d-flex justify-content-between align-items-center mb-1">
                                                 <div class="d-flex align-items-center gap-2">
                                                     <span class="embryo-time mono text-black fw-bold" title="Acquisition Time (Exact same as original)">{{ $img->capture_time }}</span>
-                                                    <form method="POST" action="{{ route('images.destroy-edit', $img->id) }}" class="d-inline m-0 p-0" onsubmit="return confirm('Are you sure you want to delete this edited annotation layer (_E)? The raw original embryo image will remain preserved.');">
+                                                    <form method="POST" action="{{ route('images.destroy-edit', $img->id) }}" class="d-inline m-0 p-0" onsubmit="return confirm('Delete this edited annotation layer (_E)? The raw original embryo image will remain preserved.');">
                                                         @csrf
                                                         @method('DELETE')
-                                                        <button type="submit" class="btn btn-sm btn-link text-danger p-0 border-0" title="Delete Edited Embryo Version" style="font-size: 11px; text-decoration: underline; font-weight: 600;">
-                                                            &times; DELETE EMBRYO
+                                                        <button type="submit" class="btn btn-sm btn-link text-danger p-0 border-0" title="Delete Edited Version (Move to 24h Trash)" style="line-height: 1;">
+                                                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-danger" style="vertical-align: -2px;">
+                                                                <polyline points="3 6 5 6 21 6"></polyline>
+                                                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                                                <line x1="10" y1="11" x2="10" y2="17"></line>
+                                                                <line x1="14" y1="11" x2="14" y2="17"></line>
+                                                            </svg>
                                                         </button>
                                                     </form>
                                                 </div>
@@ -455,11 +487,16 @@
                                         <div class="d-flex justify-content-between align-items-center mb-1">
                                             <div class="d-flex align-items-center gap-2">
                                                 <span class="embryo-time mono" title="Acquisition Time">{{ $img->capture_time }}</span>
-                                                <form method="POST" action="{{ route('images.destroy', $img->id) }}" class="d-inline m-0 p-0" onsubmit="return confirm('Are you sure you want to delete this embryo image ({{ $img->filename }})? This action cannot be undone.');">
+                                                <form method="POST" action="{{ route('images.destroy', $img->id) }}" class="d-inline m-0 p-0" onsubmit="return confirm('Move embryo image {{ $img->filename }} to Trash? It will be retained for 24 hours and can be restored.');">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" class="btn btn-sm btn-link text-danger p-0 border-0" title="Delete Embryo Image" style="font-size: 11px; text-decoration: underline; font-weight: 600;">
-                                                        &times; DELETE EMBRYO
+                                                    <button type="submit" class="btn btn-sm btn-link text-danger p-0 border-0" title="Delete Embryo Image (Move to 24h Trash)" style="line-height: 1;">
+                                                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-danger" style="vertical-align: -2px;">
+                                                            <polyline points="3 6 5 6 21 6"></polyline>
+                                                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                                            <line x1="10" y1="11" x2="10" y2="17"></line>
+                                                            <line x1="14" y1="11" x2="14" y2="17"></line>
+                                                        </svg>
                                                     </button>
                                                 </form>
                                             </div>
@@ -501,11 +538,16 @@
                                             <div class="d-flex justify-content-between align-items-center mb-1">
                                                 <div class="d-flex align-items-center gap-2">
                                                     <span class="embryo-time mono text-black fw-bold" title="Acquisition Time (Identical to original)">{{ $img->capture_time }}</span>
-                                                    <form method="POST" action="{{ route('images.destroy-edit', $img->id) }}" class="d-inline m-0 p-0" onsubmit="return confirm('Are you sure you want to delete this edited annotation layer (_E)? The raw original embryo image will remain preserved.');">
+                                                    <form method="POST" action="{{ route('images.destroy-edit', $img->id) }}" class="d-inline m-0 p-0" onsubmit="return confirm('Delete this edited annotation layer (_E)? The raw original embryo image will remain preserved.');">
                                                         @csrf
                                                         @method('DELETE')
-                                                        <button type="submit" class="btn btn-sm btn-link text-danger p-0 border-0" title="Delete Edited Embryo Version" style="font-size: 11px; text-decoration: underline; font-weight: 600;">
-                                                            &times; DELETE EMBRYO
+                                                        <button type="submit" class="btn btn-sm btn-link text-danger p-0 border-0" title="Delete Edited Version (Move to 24h Trash)" style="line-height: 1;">
+                                                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-danger" style="vertical-align: -2px;">
+                                                                <polyline points="3 6 5 6 21 6"></polyline>
+                                                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                                                <line x1="10" y1="11" x2="10" y2="17"></line>
+                                                                <line x1="14" y1="11" x2="14" y2="17"></line>
+                                                            </svg>
                                                         </button>
                                                     </form>
                                                 </div>
@@ -613,6 +655,102 @@
                     </button>
                 </div>
             </form>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== 24-HOUR TRASH BIN MODAL ==================== -->
+<div class="modal fade" id="trashModal" tabindex="-1" aria-labelledby="trashModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="d-flex align-items-center gap-2">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                    <h5 class="modal-title mb-0" id="trashModalLabel" style="font-size: 15px; font-weight: 700; text-transform: uppercase;">
+                        24-Hour Embryo Trash Bin &bull; {{ $case->case_id }}
+                    </h5>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="alert-sci mb-3 py-2 px-3" style="font-size: 12px; background-color: var(--bg-off-white);">
+                    <strong>Laboratory Data Retention Policy:</strong> Deleted embryo images are kept in this secure quarantine buffer for <strong>24 hours</strong>. During this window, both Embryologists and Admins can restore them. After 24 hours, expired items are permanently purged from disk storage.
+                </div>
+
+                @if($trashedImages->count() > 0)
+                    <div class="table-responsive">
+                        <table class="table-sci mb-0">
+                            <thead>
+                                <tr>
+                                    <th style="width: 80px;">Preview</th>
+                                    <th>Image / Timestamp</th>
+                                    <th>Day</th>
+                                    <th>Deleted At</th>
+                                    <th>Retention</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($trashedImages as $tImg)
+                                    <tr>
+                                        <td>
+                                            <img src="{{ route('images.serve', ['id' => $tImg->id, 'type' => 'original']) }}"
+                                                 alt="{{ $tImg->filename }}"
+                                                 style="width: 60px; height: 60px; object-fit: cover; border: 1px solid var(--border-grey);">
+                                        </td>
+                                        <td>
+                                            <div class="mono fw-bold" style="font-size: 12px;">{{ $tImg->filename }}</div>
+                                            <div class="text-muted mono" style="font-size: 11px;">Acquired: {{ $tImg->capture_time }}</div>
+                                            <div class="text-muted" style="font-size: 10px;">{{ $tImg->formatted_file_size }}</div>
+                                        </td>
+                                        <td>
+                                            <span class="badge-sci badge-sci-neutral" style="font-size: 11px;">Day {{ $tImg->day_number }}</span>
+                                        </td>
+                                        <td>
+                                            <div class="mono" style="font-size: 11px;">{{ $tImg->deleted_at?->format('Y-m-d H:i') }}</div>
+                                            <div class="text-muted" style="font-size: 10px;">{{ $tImg->deleted_at?->diffForHumans() }}</div>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-warning text-dark mono" style="font-size: 10px;">
+                                                {{ $tImg->trash_hours_remaining }}h remaining
+                                            </span>
+                                        </td>
+                                        <td class="text-end">
+                                            <div class="d-flex justify-content-end gap-1">
+                                                <form method="POST" action="{{ route('images.restore', $tImg->id) }}" class="d-inline">
+                                                    @csrf
+                                                    <button type="submit" class="btn btn-sm btn-sci-primary py-1 px-2" style="font-size: 11px;">
+                                                        RESTORE
+                                                    </button>
+                                                </form>
+                                                <form method="POST" action="{{ route('images.force-delete', $tImg->id) }}" class="d-inline" onsubmit="return confirm('Permanently purge {{ $tImg->filename }} from disk immediately?');">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger py-1 px-2" style="font-size: 11px;">
+                                                        PURGE NOW
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @else
+                    <div class="text-center py-4 text-muted">
+                        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="mb-2 text-muted">
+                            <polyline points="3 6 5 6 21 6"></polyline>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                        </svg>
+                        <div class="fw-bold mb-1" style="font-size: 13px;">TRASH BIN IS EMPTY</div>
+                        <p class="mb-0" style="font-size: 12px;">No embryo images deleted within the last 24 hours for this case.</p>
+                    </div>
+                @endif
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sci-secondary" data-bs-dismiss="modal">CLOSE</button>
+            </div>
         </div>
     </div>
 </div>

@@ -194,7 +194,7 @@ class EmbryoCaseWorkflowTest extends TestCase
         $viewResponse->assertSee('09-00-00_E.png');
         $viewResponse->assertSee('09:00:00');
         $viewResponse->assertSee('SAME TIME');
-        $viewResponse->assertSee('DELETE EMBRYO');
+        $viewResponse->assertSee('Delete Embryo Image');
     }
 
     public function test_ayush_embryologist_login_workflow(): void
@@ -269,8 +269,63 @@ class EmbryoCaseWorkflowTest extends TestCase
         $deleteResponse = $this->delete(route('images.destroy', $image->id));
         $deleteResponse->assertStatus(302);
 
+        // Soft-deleted in database, but file preserved on disk in 24h trash buffer
         $this->assertSoftDeleted('embryo_images', ['id' => $image->id]);
+        $this->assertTrue(Storage::disk('local')->exists($storagePath));
+
+        // Restore image from Trash
+        $restoreResponse = $this->post(route('images.restore', $image->id));
+        $restoreResponse->assertStatus(302);
+        $this->assertNotSoftDeleted('embryo_images', ['id' => $image->id]);
+        $this->assertTrue(Storage::disk('local')->exists($storagePath));
+
+        // Delete again and Force Purge
+        $this->delete(route('images.destroy', $image->id));
+        $forceResponse = $this->delete(route('images.force-delete', $image->id));
+        $forceResponse->assertStatus(302);
+        $this->assertDatabaseMissing('embryo_images', ['id' => $image->id]);
         $this->assertFalse(Storage::disk('local')->exists($storagePath));
+    }
+
+    public function test_missing_today_acquisition_warning_notification(): void
+    {
+        $embryologist = User::create([
+            'name' => 'Dr. Chen',
+            'email' => 'dr.chen@embryocase.lab',
+            'password' => Hash::make('Secret123!'),
+            'role' => 'embryologist',
+            'status' => 'active',
+            'email_verified_at' => now(),
+        ]);
+
+        $this->actingAs($embryologist);
+
+        // Case collected 2 days ago -> Today is Day 3
+        $case = EmbryoCase::create([
+            'case_id' => 'EMB-2026-0007',
+            'embryo_number' => 'E-007',
+            'father_name' => 'Father',
+            'mother_name' => 'Mother',
+            'collection_date' => now()->subDays(2)->format('Y-m-d'),
+            'collection_time' => '09:00:00',
+            'total_days' => 6,
+            'status' => 'in_progress',
+            'user_id' => $embryologist->id,
+        ]);
+
+        $this->assertEquals(3, $case->today_development_day);
+        $this->assertTrue($case->isTodayImageMissing());
+
+        // Check Case Details view shows the warning
+        $caseView = $this->get(route('cases.show', $case->case_id));
+        $caseView->assertStatus(200);
+        $caseView->assertSee("ACQUISITION IMAGE IS NOT UPLOADED (DAY 3)");
+
+        // Check Dashboard view shows the warning
+        $dashView = $this->get(route('embryologist.dashboard'));
+        $dashView->assertStatus(200);
+        $dashView->assertSee("LABORATORY SCHEDULE ALERT");
+        $dashView->assertSee("E-007");
     }
 
     public function test_delete_day_option_removes_day_and_decrements_total_days(): void

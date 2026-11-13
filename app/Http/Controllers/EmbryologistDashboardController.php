@@ -30,13 +30,16 @@ class EmbryologistDashboardController extends Controller
             ->take(10)
             ->get();
 
+        $pendingTodayCases = EmbryoCase::getCasesWithMissingTodayImage($user->id);
+
         return view('embryologist.dashboard', compact(
             'totalCases',
             'casesInProgress',
             'casesCompleted',
             'totalImagesUploaded',
             'recentCases',
-            'recentActivities'
+            'recentActivities',
+            'pendingTodayCases'
         ));
     }
 

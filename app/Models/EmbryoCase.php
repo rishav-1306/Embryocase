@@ -50,6 +50,74 @@ class EmbryoCase extends Model
     }
 
     /**
+     * Get soft-deleted embryo images retained within the 24-hour window
+     */
+    public function trashedImages24h(): HasMany
+    {
+        return $this->hasMany(EmbryoImage::class, 'case_id')
+            ->onlyTrashed()
+            ->where('deleted_at', '>=', now()->subHours(24))
+            ->orderBy('deleted_at', 'desc');
+    }
+
+    /**
+     * Get the developmental day that corresponds to today's date
+     * based on collection_date (Day 1)
+     *
+     * @return int|null
+     */
+    public function getTodayDevelopmentDayAttribute(): ?int
+    {
+        if (!$this->collection_date) {
+            return null;
+        }
+
+        $days = (int) $this->collection_date->startOfDay()->diffInDays(now()->startOfDay(), false);
+        if ($days < 0) {
+            return null; // collection date is in the future
+        }
+
+        $todayDay = $days + 1;
+        if ($todayDay > $this->total_days) {
+            return null; // tracking window exceeded
+        }
+
+        return $todayDay;
+    }
+
+    /**
+     * Check if today's scheduled image acquisition has not been uploaded yet
+     */
+    public function isTodayImageMissing(): bool
+    {
+        if ($this->status !== 'in_progress') {
+            return false;
+        }
+
+        $todayDay = $this->today_development_day;
+        if (!$todayDay) {
+            return false;
+        }
+
+        return !$this->images()->where('day_number', $todayDay)->exists();
+    }
+
+    /**
+     * Get all active cases where today's scheduled acquisition image is missing
+     */
+    public static function getCasesWithMissingTodayImage(?int $userId = null)
+    {
+        $query = self::where('status', 'in_progress')->with(['images', 'user']);
+        if ($userId) {
+            $query->where('user_id', $userId);
+        }
+
+        return $query->get()->filter(function ($case) {
+            return $case->isTodayImageMissing();
+        });
+    }
+
+    /**
      * Generate next sequential Case ID: EMB-YYYY-XXXX
      */
     public static function generateCaseId(): string

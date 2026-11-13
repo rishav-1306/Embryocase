@@ -111,6 +111,11 @@
                             @else
                                 <span class="badge-sci badge-sci-pending">IN PROGRESS</span>
                             @endif
+                            @if($case->isTodayImageMissing())
+                                <span class="badge bg-danger text-white mono d-block mt-1" style="font-size: 9px;" title="Today's acquisition photograph has not been uploaded yet">
+                                    DAY {{ $case->today_development_day }} PENDING
+                                </span>
+                            @endif
                         </td>
                         <td>
                             <div class="d-flex gap-1">

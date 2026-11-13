@@ -79,5 +79,18 @@ class EmbryoImage extends Model
         }
         return $bytes . ' B';
     }
+
+    /**
+     * Hours remaining before automatic 24-hour purge
+     */
+    public function getTrashHoursRemainingAttribute(): int
+    {
+        if (!$this->deleted_at) {
+            return 0;
+        }
+
+        $elapsed = (int) $this->deleted_at->diffInHours(now());
+        return max(0, 24 - $elapsed);
+    }
 }
 
