@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="100%" height="100%" preserveAspectRatio="xMidYMid slice">
+<defs>
+  <style>
+    .sci-line { stroke: #D5D5D5; stroke-width: 1; fill: none; }
+    .sci-line-subtle { stroke: #E6E6E6; stroke-width: 0.8; fill: none; }
+    .sci-line-bold { stroke: #BEBEBE; stroke-width: 1.2; fill: none; }
+    .sci-cell-fill { fill: #FAFAFA; stroke: #C8C8C8; stroke-width: 1; }
+    .sci-cross { stroke: #AFAFAF; stroke-width: 1; fill: none; }
+  </style>
+</defs>
+<rect width="1920" height="1080" fill="#FFFFFF" />
+<line x1="948" y1="140" x2="972" y2="140" class="sci-cross" />
+<line x1="960" y1="128" x2="960" y2="152" class="sci-cross" />
+<line x1="948" y1="930" x2="972" y2="930" class="sci-cross" />
+<line x1="960" y1="918" x2="960" y2="942" class="sci-cross" />
+<line x1="467" y1="540" x2="493" y2="540" class="sci-cross" />
+<line x1="480" y1="527" x2="480" y2="553" class="sci-cross" />
+<line x1="1427" y1="540" x2="1453" y2="540" class="sci-cross" />
+<line x1="1440" y1="527" x2="1440" y2="553" class="sci-cross" />
+<line x1="1839" y1="540" x2="1861" y2="540" class="sci-cross" />
+<line x1="1850" y1="529" x2="1850" y2="551" class="sci-cross" />
+<line x1="1272" y1="880" x2="1288" y2="880" class="sci-cross" />
+<line x1="1280" y1="872" x2="1280" y2="888" class="sci-cross" />
+<line x1="312" y1="380" x2="328" y2="380" class="sci-cross" />
+<line x1="320" y1="372" x2="320" y2="388" class="sci-cross" />
+<line x1="45" y1="540" x2="75" y2="540" class="sci-cross" />
+<line x1="1845" y1="540" x2="1875" y2="540" class="sci-cross" />
+<line x1="1730" y1="180" x2="1750" y2="180" class="sci-cross" />
+<line x1="190" y1="200" x2="210" y2="200" class="sci-cross" />
+<!-- Top-Left Cleavage Stage Embryo -->
+<g id="cleavage-embryo" opacity="0.85">
+  <circle cx="320" cy="230" r="88" class="sci-line-bold" />
+  <circle cx="320" cy="230" r="84" class="sci-line-subtle" stroke-dasharray="3,3" />
+  <circle cx="320" cy="230" r="32" class="sci-cell-fill" />
+  <circle cx="322" cy="228" r="5" class="sci-line-subtle" />
+  <circle cx="322" cy="228" r="1.5" fill="#B0B0B0" />
+  <circle cx="290" cy="204" r="30" class="sci-cell-fill" />
+  <circle cx="284" cy="200" r="5" class="sci-line-subtle" />
+  <circle cx="284" cy="200" r="1.5" fill="#B0B0B0" />
+  <circle cx="350" cy="204" r="29" class="sci-cell-fill" />
+  <circle cx="356" cy="200" r="5" class="sci-line-subtle" />
+  <circle cx="356" cy="200" r="1.5" fill="#B0B0B0" />
+  <circle cx="284" cy="250" r="28" class="sci-cell-fill" />
+  <circle cx="278" cy="254" r="5" class="sci-line-subtle" />
+  <circle cx="278" cy="254" r="1.5" fill="#B0B0B0" />
+  <circle cx="356" cy="250" r="28" class="sci-cell-fill" />
+  <circle cx="362" cy="254" r="5" class="sci-line-subtle" />
+  <circle cx="362" cy="254" r="1.5" fill="#B0B0B0" />
+  <circle cx="320" cy="188" r="24" class="sci-cell-fill" />
+  <circle cx="320" cy="182" r="5" class="sci-line-subtle" />
+  <circle cx="320" cy="182" r="1.5" fill="#B0B0B0" />
+  <circle cx="298" cy="274" r="25" class="sci-cell-fill" />
+  <circle cx="294" cy="280" r="5" class="sci-line-subtle" />
+  <circle cx="294" cy="280" r="1.5" fill="#B0B0B0" />
+  <circle cx="344" cy="272" r="25" class="sci-cell-fill" />
+  <circle cx="348" cy="278" r="5" class="sci-line-subtle" />
+  <circle cx="348" cy="278" r="1.5" fill="#B0B0B0" />
+  <circle cx="268" cy="178" r="7" class="sci-line" fill="#F5F5F5" />
+</g>
+<!-- Top-Right Blastocyst Embryo -->
+<g id="blastocyst-embryo" opacity="0.85">
+  <circle cx="1640" cy="230" r="88" class="sci-line-bold" />
+  <circle cx="1640" cy="230" r="85" class="sci-line-subtle" />
+  <circle cx="1717" cy="230" r="8" class="sci-cell-fill" />
+  <circle cx="1717" cy="230" r="1.2" fill="#AFAFAF" />
+  <circle cx="1715.069449238" cy="247.13411191464" r="8" class="sci-cell-fill" />
+  <circle cx="1715.069449238" cy="247.13411191464" r="1.2" fill="#AFAFAF" />
+  <circle cx="1709.3746028285" cy="263.40904791205" r="8" class="sci-cell-fill" />
+  <circle cx="1709.3746028285" cy="263.40904791205" r="1.2" fill="#AFAFAF" />
+  <circle cx="1700.20102415" cy="278.00871474312" r="8" class="sci-cell-fill" />
+  <circle cx="1700.20102415" cy="278.00871474312" r="1.2" fill="#AFAFAF" />
+  <circle cx="1688.0087147431" cy="290.20102415004" r="8" class="sci-cell-fill" />
+  <circle cx="1688.0087147431" cy="290.20102415004" r="1.2" fill="#AFAFAF" />
+  <circle cx="1673.4090479121" cy="299.37460282849" r="8" class="sci-cell-fill" />
+  <circle cx="1673.4090479121" cy="299.37460282849" r="1.2" fill="#AFAFAF" />
+  <circle cx="1657.1341119146" cy="305.069449238" r="8" class="sci-cell-fill" />
+  <circle cx="1657.1341119146" cy="305.069449238" r="1.2" fill="#AFAFAF" />
+  <circle cx="1640" cy="307" r="8" class="sci-cell-fill" />
+  <circle cx="1640" cy="307" r="1.2" fill="#AFAFAF" />
+  <circle cx="1622.8658880854" cy="305.069449238" r="8" class="sci-cell-fill" />
+  <circle cx="1622.8658880854" cy="305.069449238" r="1.2" fill="#AFAFAF" />
+  <circle cx="1606.5909520879" cy="299.37460282849" r="8" class="sci-cell-fill" />
+  <circle cx="1606.5909520879" cy="299.37460282849" r="1.2" fill="#AFAFAF" />
+  <circle cx="1591.9912852569" cy="290.20102415004" r="8" class="sci-cell-fill" />
+  <circle cx="1591.9912852569" cy="290.20102415004" r="1.2" fill="#AFAFAF" />
+  <circle cx="1579.79897585" cy="278.00871474312" r="8" class="sci-cell-fill" />
+  <circle cx="1579.79897585" cy="278.00871474312" r="1.2" fill="#AFAFAF" />
+  <circle cx="1570.6253971715" cy="263.40904791205" r="8" class="sci-cell-fill" />
+  <circle cx="1570.6253971715" cy="263.40904791205" r="1.2" fill="#AFAFAF" />
+  <circle cx="1564.930550762" cy="247.13411191464" r="8" class="sci-cell-fill" />
+  <circle cx="1564.930550762" cy="247.13411191464" r="1.2" fill="#AFAFAF" />
+  <circle cx="1563" cy="230" r="8" class="sci-cell-fill" />
+  <circle cx="1563" cy="230" r="1.2" fill="#AFAFAF" />
+  <circle cx="1564.930550762" cy="212.86588808536" r="8" class="sci-cell-fill" />
+  <circle cx="1564.930550762" cy="212.86588808536" r="1.2" fill="#AFAFAF" />
+  <circle cx="1570.6253971715" cy="196.59095208795" r="8" class="sci-cell-fill" />
+  <circle cx="1570.6253971715" cy="196.59095208795" r="1.2" fill="#AFAFAF" />
+  <circle cx="1579.79897585" cy="181.99128525688" r="8" class="sci-cell-fill" />
+  <circle cx="1579.79897585" cy="181.99128525688" r="1.2" fill="#AFAFAF" />
+  <circle cx="1591.9912852569" cy="169.79897584996" r="8" class="sci-cell-fill" />
+  <circle cx="1591.9912852569" cy="169.79897584996" r="1.2" fill="#AFAFAF" />
+  <circle cx="1606.5909520879" cy="160.62539717151" r="8" class="sci-cell-fill" />
+  <circle cx="1606.5909520879" cy="160.62539717151" r="1.2" fill="#AFAFAF" />
+  <circle cx="1622.8658880854" cy="154.930550762" r="8" class="sci-cell-fill" />
+  <circle cx="1622.8658880854" cy="154.930550762" r="1.2" fill="#AFAFAF" />
+  <circle cx="1640" cy="153" r="8" class="sci-cell-fill" />
+  <circle cx="1640" cy="153" r="1.2" fill="#AFAFAF" />
+  <circle cx="1657.1341119146" cy="154.930550762" r="8" class="sci-cell-fill" />
+  <circle cx="1657.1341119146" cy="154.930550762" r="1.2" fill="#AFAFAF" />
+  <circle cx="1673.4090479121" cy="160.62539717151" r="8" class="sci-cell-fill" />
+  <circle cx="1673.4090479121" cy="160.62539717151" r="1.2" fill="#AFAFAF" />
+  <circle cx="1688.0087147431" cy="169.79897584996" r="8" class="sci-cell-fill" />
+  <circle cx="1688.0087147431" cy="169.79897584996" r="1.2" fill="#AFAFAF" />
+  <circle cx="1700.20102415" cy="181.99128525688" r="8" class="sci-cell-fill" />
+  <circle cx="1700.20102415" cy="181.99128525688" r="1.2" fill="#AFAFAF" />
+  <circle cx="1709.3746028285" cy="196.59095208795" r="8" class="sci-cell-fill" />
+  <circle cx="1709.3746028285" cy="196.59095208795" r="1.2" fill="#AFAFAF" />
+  <circle cx="1715.069449238" cy="212.86588808536" r="8" class="sci-cell-fill" />
+  <circle cx="1715.069449238" cy="212.86588808536" r="1.2" fill="#AFAFAF" />
+  <circle cx="1606" cy="245" r="14" class="sci-cell-fill" />
+  <circle cx="1606" cy="245" r="1.5" fill="#AFAFAF" />
+  <circle cx="1622" cy="258" r="13" class="sci-cell-fill" />
+  <circle cx="1622" cy="258" r="1.5" fill="#AFAFAF" />
+  <circle cx="1602" cy="264" r="12" class="sci-cell-fill" />
+  <circle cx="1602" cy="264" r="1.5" fill="#AFAFAF" />
+  <circle cx="1626" cy="274" r="12" class="sci-cell-fill" />
+  <circle cx="1626" cy="274" r="1.5" fill="#AFAFAF" />
+  <circle cx="1596" cy="230" r="13" class="sci-cell-fill" />
+  <circle cx="1596" cy="230" r="1.5" fill="#AFAFAF" />
+  <circle cx="1616" cy="230" r="12" class="sci-cell-fill" />
+  <circle cx="1616" cy="230" r="1.5" fill="#AFAFAF" />
+  <circle cx="1630" cy="242" r="11" class="sci-cell-fill" />
+  <circle cx="1630" cy="242" r="1.5" fill="#AFAFAF" />
+  <circle cx="1610" cy="278" r="11" class="sci-cell-fill" />
+  <circle cx="1610" cy="278" r="1.5" fill="#AFAFAF" />
+  <circle cx="1638" cy="262" r="10" class="sci-cell-fill" />
+  <circle cx="1638" cy="262" r="1.5" fill="#AFAFAF" />
+  <circle cx="1594" cy="250" r="11" class="sci-cell-fill" />
+  <circle cx="1594" cy="250" r="1.5" fill="#AFAFAF" />
+  <path d="M 1620 170 A 55 55 0 0 1 1700 250" class="sci-line-subtle" stroke-dasharray="4,3" />
+</g>
+<!-- Top DNA Double Helix -->
+<g opacity="0.75">
+<line x1="1120" y1="-2.7" x2="1157.3" y2="-41.8" class="sci-line-subtle" />
+<line x1="1128.8" y1="25.5" x2="1185.9" y2="-34.4" class="sci-line-subtle" />
+<line x1="1150.9" y1="39.7" x2="1201.1" y2="-13" class="sci-line-subtle" />
+<line x1="1184.8" y1="41.5" x2="1204.6" y2="20.7" class="sci-line-subtle" />
+<line x1="1223.2" y1="38.5" x2="1203.4" y2="59.3" class="sci-line-subtle" />
+<line x1="1257.1" y1="40.3" x2="1206.9" y2="93" class="sci-line-subtle" />
+<line x1="1279.2" y1="54.5" x2="1222.1" y2="114.4" class="sci-line-subtle" />
+<line x1="1288" y1="82.7" x2="1250.7" y2="121.8" class="sci-line-subtle" />
+<line x1="1288" y1="157.3" x2="1325.3" y2="118.2" class="sci-line-subtle" />
+<line x1="1296.8" y1="185.5" x2="1353.9" y2="125.6" class="sci-line-subtle" />
+<line x1="1318.9" y1="199.7" x2="1369.1" y2="147" class="sci-line-subtle" />
+<line x1="1352.8" y1="201.5" x2="1372.6" y2="180.7" class="sci-line-subtle" />
+<line x1="1391.2" y1="198.5" x2="1371.4" y2="219.3" class="sci-line-subtle" />
+<line x1="1425.1" y1="200.3" x2="1374.9" y2="253" class="sci-line-subtle" />
+<line x1="1447.2" y1="214.5" x2="1390.1" y2="274.4" class="sci-line-subtle" />
+<line x1="1456" y1="242.7" x2="1418.7" y2="281.8" class="sci-line-subtle" />
+<line x1="1456" y1="317.3" x2="1493.3" y2="278.2" class="sci-line-subtle" />
+<line x1="1464.8" y1="345.5" x2="1521.9" y2="285.6" class="sci-line-subtle" />
+<line x1="1486.9" y1="359.7" x2="1537.1" y2="307" class="sci-line-subtle" />
+<line x1="1520.8" y1="361.5" x2="1540.6" y2="340.7" class="sci-line-subtle" />
+<path d="M 1120 -40 L 1119.7 -31.2 L 1119.4 -22.6 L 1119.4 -14.2 L 1119.8 -6.1 L 1120.5 1.5 L 1121.8 8.6 L 1123.6 15.1 L 1126.1 20.9 L 1129.2 26 L 1133 30.4 L 1137.6 34 L 1142.9 36.9 L 1148.8 39.1 L 1155.4 40.6 L 1162.5 41.5 L 1170.2 41.9 L 1178.2 41.8 L 1186.6 41.4 L 1195.3 40.8 L 1204 40 L 1212.7 39.2 L 1221.4 38.6 L 1229.8 38.2 L 1237.8 38.1 L 1245.5 38.5 L 1252.6 39.4 L 1259.2 40.9 L 1265.1 43.1 L 1270.4 46 L 1275 49.6 L 1278.8 54 L 1281.9 59.1 L 1284.4 64.9 L 1286.2 71.4 L 1287.5 78.5 L 1288.2 86.1 L 1288.6 94.2 L 1288.6 102.6 L 1288.3 111.2 L 1288 120 L 1287.7 128.8 L 1287.4 137.4 L 1287.4 145.8 L 1287.8 153.9 L 1288.5 161.5 L 1289.8 168.6 L 1291.6 175.1 L 1294.1 180.9 L 1297.2 186 L 1301 190.4 L 1305.6 194 L 1310.9 196.9 L 1316.8 199.1 L 1323.4 200.6 L 1330.5 201.5 L 1338.2 201.9 L 1346.2 201.8 L 1354.6 201.4 L 1363.3 200.8 L 1372 200 L 1380.7 199.2 L 1389.4 198.6 L 1397.8 198.2 L 1405.8 198.1 L 1413.5 198.5 L 1420.6 199.4 L 1427.2 200.9 L 1433.1 203.1 L 1438.4 206 L 1443 209.6 L 1446.8 214 L 1449.9 219.1 L 1452.4 224.9 L 1454.2 231.4 L 1455.5 238.5 L 1456.2 246.1 L 1456.6 254.2 L 1456.6 262.6 L 1456.3 271.2 L 1456 280 L 1455.7 288.8 L 1455.4 297.4 L 1455.4 305.8 L 1455.8 313.9 L 1456.5 321.5 L 1457.8 328.6 L 1459.6 335.1 L 1462.1 340.9 L 1465.2 346 L 1469 350.4 L 1473.6 354 L 1478.9 356.9 L 1484.8 359.1 L 1491.4 360.6 L 1498.5 361.5 L 1506.2 361.9 L 1514.2 361.8 L 1522.6 361.4 L 1531.3 360.8 L 1540 360" class="sci-line" />
+<path d="M 1120 -40 L 1128.7 -40.8 L 1137.4 -41.4 L 1145.8 -41.8 L 1153.8 -41.9 L 1161.5 -41.5 L 1168.6 -40.6 L 1175.2 -39.1 L 1181.1 -36.9 L 1186.4 -34 L 1191 -30.4 L 1194.8 -26 L 1197.9 -20.9 L 1200.4 -15.1 L 1202.2 -8.6 L 1203.5 -1.5 L 1204.2 6.1 L 1204.6 14.2 L 1204.6 22.6 L 1204.3 31.2 L 1204 40 L 1203.7 48.8 L 1203.4 57.4 L 1203.4 65.8 L 1203.8 73.9 L 1204.5 81.5 L 1205.8 88.6 L 1207.6 95.1 L 1210.1 100.9 L 1213.2 106 L 1217 110.4 L 1221.6 114 L 1226.9 116.9 L 1232.8 119.1 L 1239.4 120.6 L 1246.5 121.5 L 1254.2 121.9 L 1262.2 121.8 L 1270.6 121.4 L 1279.3 120.8 L 1288 120 L 1296.7 119.2 L 1305.4 118.6 L 1313.8 118.2 L 1321.8 118.1 L 1329.5 118.5 L 1336.6 119.4 L 1343.2 120.9 L 1349.1 123.1 L 1354.4 126 L 1359 129.6 L 1362.8 134 L 1365.9 139.1 L 1368.4 144.9 L 1370.2 151.4 L 1371.5 158.5 L 1372.2 166.1 L 1372.6 174.2 L 1372.6 182.6 L 1372.3 191.2 L 1372 200 L 1371.7 208.8 L 1371.4 217.4 L 1371.4 225.8 L 1371.8 233.9 L 1372.5 241.5 L 1373.8 248.6 L 1375.6 255.1 L 1378.1 260.9 L 1381.2 266 L 1385 270.4 L 1389.6 274 L 1394.9 276.9 L 1400.8 279.1 L 1407.4 280.6 L 1414.5 281.5 L 1422.2 281.9 L 1430.2 281.8 L 1438.6 281.4 L 1447.3 280.8 L 1456 280 L 1464.7 279.2 L 1473.4 278.6 L 1481.8 278.2 L 1489.8 278.1 L 1497.5 278.5 L 1504.6 279.4 L 1511.2 280.9 L 1517.1 283.1 L 1522.4 286 L 1527 289.6 L 1530.8 294 L 1533.9 299.1 L 1536.4 304.9 L 1538.2 311.4 L 1539.5 318.5 L 1540.2 326.1 L 1540.6 334.2 L 1540.6 342.6 L 1540.3 351.2 L 1540 360" class="sci-line" />
+</g>
+<!-- Bottom DNA Double Helix -->
+<g opacity="0.75">
+<line x1="260.2" y1="1143.6" x2="224.3" y2="1099.9" class="sci-line-subtle" />
+<line x1="291.9" y1="1137" x2="236.9" y2="1070" class="sci-line-subtle" />
+<line x1="310.9" y1="1114.7" x2="262.5" y2="1055.8" class="sci-line-subtle" />
+<line x1="318.4" y1="1078.6" x2="299.3" y2="1055.4" class="sci-line-subtle" />
+<line x1="321.6" y1="1037.1" x2="340.7" y2="1060.4" class="sci-line-subtle" />
+<line x1="329.1" y1="1001" x2="377.5" y2="1059.9" class="sci-line-subtle" />
+<line x1="348.1" y1="978.7" x2="403.1" y2="1045.7" class="sci-line-subtle" />
+<line x1="379.8" y1="972.1" x2="415.7" y2="1015.8" class="sci-line-subtle" />
+<line x1="460.2" y1="979.3" x2="424.3" y2="935.6" class="sci-line-subtle" />
+<line x1="491.9" y1="972.7" x2="436.9" y2="905.7" class="sci-line-subtle" />
+<line x1="510.9" y1="950.4" x2="462.5" y2="891.5" class="sci-line-subtle" />
+<line x1="518.4" y1="914.3" x2="499.3" y2="891.1" class="sci-line-subtle" />
+<line x1="521.6" y1="872.8" x2="540.7" y2="896.1" class="sci-line-subtle" />
+<line x1="529.1" y1="836.7" x2="577.5" y2="895.6" class="sci-line-subtle" />
+<line x1="548.1" y1="814.5" x2="603.1" y2="881.4" class="sci-line-subtle" />
+<line x1="579.8" y1="807.8" x2="615.7" y2="851.5" class="sci-line-subtle" />
+<line x1="660.2" y1="815" x2="624.3" y2="771.3" class="sci-line-subtle" />
+<line x1="691.9" y1="808.4" x2="636.9" y2="741.4" class="sci-line-subtle" />
+<line x1="710.9" y1="786.1" x2="662.5" y2="727.2" class="sci-line-subtle" />
+<line x1="718.4" y1="750" x2="699.3" y2="726.8" class="sci-line-subtle" />
+<line x1="721.6" y1="708.5" x2="740.7" y2="731.8" class="sci-line-subtle" />
+<line x1="729.1" y1="672.5" x2="777.5" y2="731.3" class="sci-line-subtle" />
+<line x1="748.1" y1="650.2" x2="803.1" y2="717.1" class="sci-line-subtle" />
+<path d="M 220 1140 L 229.4 1141.2 L 238.6 1142.3 L 247.7 1143.1 L 256.4 1143.6 L 264.7 1143.5 L 272.6 1142.9 L 279.9 1141.5 L 286.6 1139.5 L 292.6 1136.6 L 297.9 1132.9 L 302.6 1128.4 L 306.6 1123.1 L 309.9 1116.9 L 312.6 1110 L 314.7 1102.4 L 316.4 1094.3 L 317.7 1085.6 L 318.6 1076.6 L 319.4 1067.3 L 320 1057.9 L 320.6 1048.4 L 321.4 1039.1 L 322.3 1030.1 L 323.6 1021.4 L 325.3 1013.3 L 327.4 1005.7 L 330.1 998.8 L 333.4 992.7 L 337.4 987.3 L 342.1 982.8 L 347.4 979.1 L 353.4 976.2 L 360.1 974.2 L 367.4 972.9 L 375.3 972.2 L 383.6 972.2 L 392.3 972.6 L 401.4 973.4 L 410.6 974.5 L 420 975.7 L 429.4 976.9 L 438.6 978 L 447.7 978.8 L 456.4 979.3 L 464.7 979.2 L 472.6 978.6 L 479.9 977.3 L 486.6 975.2 L 492.6 972.3 L 497.9 968.6 L 502.6 964.1 L 506.6 958.8 L 509.9 952.6 L 512.6 945.7 L 514.7 938.1 L 516.4 930 L 517.7 921.3 L 518.6 912.3 L 519.4 903 L 520 893.6 L 520.6 884.1 L 521.4 874.9 L 522.3 865.8 L 523.6 857.2 L 525.3 849 L 527.4 841.4 L 530.1 834.5 L 533.4 828.4 L 537.4 823 L 542.1 818.5 L 547.4 814.8 L 553.4 811.9 L 560.1 809.9 L 567.4 808.6 L 575.3 807.9 L 583.6 807.9 L 592.3 808.3 L 601.4 809.1 L 610.6 810.2 L 620 811.4 L 629.4 812.6 L 638.6 813.7 L 647.7 814.5 L 656.4 815 L 664.7 814.9 L 672.6 814.3 L 679.9 813 L 686.6 810.9 L 692.6 808 L 697.9 804.4 L 702.6 799.8 L 706.6 794.5 L 709.9 788.3 L 712.6 781.4 L 714.7 773.9 L 716.4 765.7 L 717.7 757 L 718.6 748 L 719.4 738.7 L 720 729.3 L 720.6 719.9 L 721.4 710.6 L 722.3 701.5 L 723.6 692.9 L 725.3 684.7 L 727.4 677.1 L 730.1 670.2 L 733.4 664.1 L 737.4 658.7 L 742.1 654.2 L 747.4 650.5 L 753.4 647.7" class="sci-line" />
+<path d="M 220 1140 L 220.6 1130.6 L 221.4 1121.3 L 222.3 1112.2 L 223.6 1103.6 L 225.3 1095.4 L 227.4 1087.9 L 230.1 1081 L 233.4 1074.8 L 237.4 1069.5 L 242.1 1064.9 L 247.4 1061.2 L 253.4 1058.4 L 260.1 1056.3 L 267.4 1055 L 275.3 1054.4 L 283.6 1054.3 L 292.3 1054.7 L 301.4 1055.6 L 310.6 1056.6 L 320 1057.9 L 329.4 1059.1 L 338.6 1060.1 L 347.7 1061 L 356.4 1061.4 L 364.7 1061.4 L 372.6 1060.7 L 379.9 1059.4 L 386.6 1057.3 L 392.6 1054.5 L 397.9 1050.8 L 402.6 1046.3 L 406.6 1040.9 L 409.9 1034.8 L 412.6 1027.9 L 414.7 1020.3 L 416.4 1012.1 L 417.7 1003.5 L 418.6 994.4 L 419.4 985.1 L 420 975.7 L 420.6 966.3 L 421.4 957 L 422.3 948 L 423.6 939.3 L 425.3 931.1 L 427.4 923.6 L 430.1 916.7 L 433.4 910.5 L 437.4 905.2 L 442.1 900.6 L 447.4 897 L 453.4 894.1 L 460.1 892 L 467.4 890.7 L 475.3 890.1 L 483.6 890 L 492.3 890.5 L 501.4 891.3 L 510.6 892.4 L 520 893.6 L 529.4 894.8 L 538.6 895.9 L 547.7 896.7 L 556.4 897.1 L 564.7 897.1 L 572.6 896.4 L 579.9 895.1 L 586.6 893.1 L 592.6 890.2 L 597.9 886.5 L 602.6 882 L 606.6 876.6 L 609.9 870.5 L 612.6 863.6 L 614.7 856 L 616.4 847.8 L 617.7 839.2 L 618.6 830.1 L 619.4 820.9 L 620 811.4 L 620.6 802 L 621.4 792.7 L 622.3 783.7 L 623.6 775 L 625.3 766.9 L 627.4 759.3 L 630.1 752.4 L 633.4 746.2 L 637.4 740.9 L 642.1 736.4 L 647.4 732.7 L 653.4 729.8 L 660.1 727.7 L 667.4 726.4 L 675.3 725.8 L 683.6 725.7 L 692.3 726.2 L 701.4 727 L 710.6 728.1 L 720 729.3 L 729.4 730.5 L 738.6 731.6 L 747.7 732.4 L 756.4 732.8 L 764.7 732.8 L 772.6 732.1 L 779.9 730.8 L 786.6 728.8 L 792.6 725.9 L 797.9 722.2 L 802.6 717.7 L 806.6 712.3" class="sci-line" />
+</g>
+<g class="sci-cluster" opacity="0.8">
+  <circle cx="280" cy="780" r="11" class="sci-cell-fill" />
+  <circle cx="280" cy="780" r="2" fill="#AFAFAF" />
+  <circle cx="300.35" cy="780" r="9.68" class="sci-cell-fill" />
+  <circle cx="300.35" cy="780" r="1.8" fill="#AFAFAF" />
+  <circle cx="290.175" cy="797.62361696701" r="9.68" class="sci-cell-fill" />
+  <circle cx="290.175" cy="797.62361696701" r="1.8" fill="#AFAFAF" />
+  <circle cx="269.825" cy="797.62361696701" r="9.68" class="sci-cell-fill" />
+  <circle cx="269.825" cy="797.62361696701" r="1.8" fill="#AFAFAF" />
+  <circle cx="259.65" cy="780" r="9.68" class="sci-cell-fill" />
+  <circle cx="259.65" cy="780" r="1.8" fill="#AFAFAF" />
+  <circle cx="269.825" cy="762.37638303299" r="9.68" class="sci-cell-fill" />
+  <circle cx="269.825" cy="762.37638303299" r="1.8" fill="#AFAFAF" />
+  <circle cx="290.175" cy="762.37638303299" r="9.68" class="sci-cell-fill" />
+  <circle cx="290.175" cy="762.37638303299" r="1.8" fill="#AFAFAF" />
+</g>
+<g class="sci-cluster" opacity="0.8">
+  <circle cx="1420" cy="840" r="12" class="sci-cell-fill" />
+  <circle cx="1420" cy="840" r="2" fill="#AFAFAF" />
+  <circle cx="1442.2" cy="840" r="10.56" class="sci-cell-fill" />
+  <circle cx="1442.2" cy="840" r="1.8" fill="#AFAFAF" />
+  <circle cx="1433.8414736013" cy="857.35665891079" r="10.56" class="sci-cell-fill" />
+  <circle cx="1433.8414736013" cy="857.35665891079" r="1.8" fill="#AFAFAF" />
+  <circle cx="1415.0600352662" cy="861.64339965044" r="10.56" class="sci-cell-fill" />
+  <circle cx="1415.0600352662" cy="861.64339965044" r="1.8" fill="#AFAFAF" />
+  <circle cx="1399.9984911326" cy="849.63221900841" r="10.56" class="sci-cell-fill" />
+  <circle cx="1399.9984911326" cy="849.63221900841" r="1.8" fill="#AFAFAF" />
+  <circle cx="1399.9984911326" cy="830.36778099159" r="10.56" class="sci-cell-fill" />
+  <circle cx="1399.9984911326" cy="830.36778099159" r="1.8" fill="#AFAFAF" />
+  <circle cx="1415.0600352662" cy="818.35660034956" r="10.56" class="sci-cell-fill" />
+  <circle cx="1415.0600352662" cy="818.35660034956" r="1.8" fill="#AFAFAF" />
+  <circle cx="1433.8414736013" cy="822.64334108921" r="10.56" class="sci-cell-fill" />
+  <circle cx="1433.8414736013" cy="822.64334108921" r="1.8" fill="#AFAFAF" />
+</g>
+<circle cx="240" cy="880" r="8" class="sci-cell-fill" opacity="0.75" />
+<circle cx="240" cy="880" r="1.5" fill="#AFAFAF" opacity="0.75" />
+<circle cx="200" cy="930" r="6" class="sci-cell-fill" opacity="0.75" />
+<circle cx="200" cy="930" r="1.5" fill="#AFAFAF" opacity="0.75" />
+<circle cx="380" cy="640" r="7" class="sci-cell-fill" opacity="0.75" />
+<circle cx="380" cy="640" r="1.5" fill="#AFAFAF" opacity="0.75" />
+<circle cx="400" cy="700" r="5" class="sci-cell-fill" opacity="0.75" />
+<circle cx="400" cy="700" r="1.5" fill="#AFAFAF" opacity="0.75" />
+<circle cx="1300" cy="720" r="8" class="sci-cell-fill" opacity="0.75" />
+<circle cx="1300" cy="720" r="1.5" fill="#AFAFAF" opacity="0.75" />
+<circle cx="1320" cy="890" r="7" class="sci-cell-fill" opacity="0.75" />
+<circle cx="1320" cy="890" r="1.5" fill="#AFAFAF" opacity="0.75" />
+<circle cx="1480" cy="910" r="6" class="sci-cell-fill" opacity="0.75" />
+<circle cx="1480" cy="910" r="1.5" fill="#AFAFAF" opacity="0.75" />
+<circle cx="1540" cy="850" r="7" class="sci-cell-fill" opacity="0.75" />
+<circle cx="1540" cy="850" r="1.5" fill="#AFAFAF" opacity="0.75" />
+<circle cx="160" cy="580" r="9" class="sci-cell-fill" opacity="0.75" />
+<circle cx="160" cy="580" r="1.5" fill="#AFAFAF" opacity="0.75" />
+<circle cx="1740" cy="420" r="8" class="sci-cell-fill" opacity="0.75" />
+<circle cx="1740" cy="420" r="1.5" fill="#AFAFAF" opacity="0.75" />
+<circle cx="1800" cy="380" r="6" class="sci-cell-fill" opacity="0.75" />
+<circle cx="1800" cy="380" r="1.5" fill="#AFAFAF" opacity="0.75" />
+<!-- Sweeping Microfluidic Wave Contours -->
+<g opacity="0.6">
+  <path d="M 1680,0 C 1820,280 1700,580 1860,840 C 1920,940 1960,1020 2000,1080" class="sci-line-subtle" />
+  <path d="M 1740,0 C 1880,300 1760,600 1900,860 C 1950,960 1990,1030 2030,1080" class="sci-line-subtle" />
+  <path d="M 1800,0 C 1940,320 1820,620 1940,880 C 1980,970 2020,1040 2060,1080" class="sci-line-subtle" />
+  <path d="M -40,160 C 140,340 180,640 -20,940" class="sci-line-subtle" />
+  <path d="M -80,200 C 100,380 140,660 -60,980" class="sci-line-subtle" />
+</g>
+</svg>
