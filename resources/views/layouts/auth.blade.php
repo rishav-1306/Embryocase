@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="{{ asset('css/embryocase.css') }}">
     <style>
         body {
-            background-color: #F5F5F7;
+            background-color: #ECEEF0;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
@@ -17,7 +17,7 @@
             overflow-x: hidden;
         }
 
-        /* Fixed Blurry Black Background Decor */
+        /* Fixed Blurry Black Background Decor - 80% Visibility */
         .auth-bg-decor {
             position: fixed;
             top: 0;
@@ -36,103 +36,107 @@
             will-change: transform, opacity, filter;
         }
 
-        /* Shape 1: Top-Right Deep Black Cloud */
+        /* Shape 1: Top-Right Bold Black Cloud (80% visible) */
         .auth-blur-1 {
+            width: 650px;
+            height: 650px;
+            top: -180px;
+            right: -140px;
+            background: radial-gradient(circle, rgba(0, 0, 0, 0.85) 0%, rgba(15, 15, 15, 0.75) 45%, rgba(30, 30, 30, 0.35) 70%, transparent 100%);
+            filter: blur(50px);
+            opacity: 0.80;
+            animation: quickReloadBloom1 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        /* Shape 2: Bottom-Left Bold Black Cloud (80% visible) */
+        .auth-blur-2 {
+            width: 680px;
+            height: 680px;
+            bottom: -200px;
+            left: -160px;
+            background: radial-gradient(circle, rgba(0, 0, 0, 0.85) 0%, rgba(15, 15, 15, 0.72) 45%, rgba(30, 30, 30, 0.35) 70%, transparent 100%);
+            filter: blur(55px);
+            opacity: 0.80;
+            animation: quickReloadBloom2 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        /* Shape 3: Central Backing Cloud framing the login card (80% visible core) */
+        .auth-blur-3 {
             width: 580px;
             height: 580px;
-            top: -160px;
-            right: -140px;
-            background: radial-gradient(circle, rgba(0, 0, 0, 0.38) 0%, rgba(20, 20, 20, 0.20) 50%, rgba(0, 0, 0, 0) 75%);
-            filter: blur(65px);
-            animation: quickReloadBloom1 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-
-        /* Shape 2: Bottom-Left Deep Black Cloud */
-        .auth-blur-2 {
-            width: 620px;
-            height: 620px;
-            bottom: -180px;
-            left: -160px;
-            background: radial-gradient(circle, rgba(0, 0, 0, 0.35) 0%, rgba(20, 20, 20, 0.18) 50%, rgba(0, 0, 0, 0) 75%);
-            filter: blur(70px);
-            animation: quickReloadBloom2 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-
-        /* Shape 3: Central Aura Behind Login Card */
-        .auth-blur-3 {
-            width: 520px;
-            height: 520px;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: radial-gradient(circle, rgba(0, 0, 0, 0.28) 0%, rgba(30, 30, 30, 0.14) 50%, rgba(0, 0, 0, 0) 75%);
-            filter: blur(60px);
-            animation: quickReloadBloomCenter 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            background: radial-gradient(circle, rgba(0, 0, 0, 0.82) 0%, rgba(20, 20, 20, 0.65) 45%, rgba(40, 40, 40, 0.25) 75%, transparent 100%);
+            filter: blur(48px);
+            opacity: 0.80;
+            animation: quickReloadBloomCenter 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
-        /* Shape 4: Mid-Right Subtle Secondary Orb */
+        /* Shape 4: Top-Left Balancing Cloud */
         .auth-blur-4 {
-            width: 380px;
-            height: 380px;
-            top: 60%;
-            right: -80px;
-            background: radial-gradient(circle, rgba(0, 0, 0, 0.25) 0%, rgba(40, 40, 40, 0.12) 50%, rgba(0, 0, 0, 0) 75%);
-            filter: blur(55px);
-            animation: quickReloadBloom4 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            width: 440px;
+            height: 440px;
+            top: 10%;
+            left: -120px;
+            background: radial-gradient(circle, rgba(0, 0, 0, 0.80) 0%, rgba(25, 25, 25, 0.60) 50%, transparent 80%);
+            filter: blur(45px);
+            opacity: 0.75;
+            animation: quickReloadBloom4 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
-        /* Quick reload animation: visible rapid bloom on load/reload, then stays completely stable and still */
+        /* Quick reload animation: punchy fast bloom to 80% visibility on load/reload, then completely static */
         @keyframes quickReloadBloom1 {
             0% {
                 opacity: 0;
-                transform: scale(0.5) translate(30px, -30px);
-                filter: blur(20px);
+                transform: scale(0.6) translate(40px, -40px);
+                filter: blur(15px);
             }
             70% {
-                opacity: 1;
-                transform: scale(1.05) translate(0, 0);
-                filter: blur(55px);
+                opacity: 0.90;
+                transform: scale(1.04) translate(0, 0);
+                filter: blur(45px);
             }
             100% {
-                opacity: 1;
+                opacity: 0.80;
                 transform: scale(1) translate(0, 0);
-                filter: blur(65px);
+                filter: blur(50px);
             }
         }
 
         @keyframes quickReloadBloom2 {
             0% {
                 opacity: 0;
-                transform: scale(0.5) translate(-30px, 30px);
-                filter: blur(20px);
+                transform: scale(0.6) translate(-40px, 40px);
+                filter: blur(15px);
             }
             70% {
-                opacity: 1;
-                transform: scale(1.05) translate(0, 0);
-                filter: blur(60px);
+                opacity: 0.90;
+                transform: scale(1.04) translate(0, 0);
+                filter: blur(50px);
             }
             100% {
-                opacity: 1;
+                opacity: 0.80;
                 transform: scale(1) translate(0, 0);
-                filter: blur(70px);
+                filter: blur(55px);
             }
         }
 
         @keyframes quickReloadBloomCenter {
             0% {
                 opacity: 0;
-                transform: translate(-50%, -50%) scale(0.4);
-                filter: blur(20px);
+                transform: translate(-50%, -50%) scale(0.5);
+                filter: blur(15px);
             }
             70% {
-                opacity: 1;
-                transform: translate(-50%, -50%) scale(1.06);
-                filter: blur(50px);
+                opacity: 0.90;
+                transform: translate(-50%, -50%) scale(1.05);
+                filter: blur(42px);
             }
             100% {
-                opacity: 1;
+                opacity: 0.80;
                 transform: translate(-50%, -50%) scale(1);
-                filter: blur(60px);
+                filter: blur(48px);
             }
         }
 
@@ -140,26 +144,26 @@
             0% {
                 opacity: 0;
                 transform: scale(0.5);
-                filter: blur(20px);
+                filter: blur(15px);
             }
             100% {
-                opacity: 1;
+                opacity: 0.75;
                 transform: scale(1);
-                filter: blur(55px);
+                filter: blur(45px);
             }
         }
 
         .sci-navbar {
             position: relative;
-            z-index: 2;
-            background-color: rgba(255, 255, 255, 0.92);
+            z-index: 10;
+            background-color: rgba(255, 255, 255, 0.96);
             backdrop-filter: blur(10px);
             border-bottom: 1px solid var(--border-grey);
         }
 
         .auth-container {
             position: relative;
-            z-index: 1;
+            z-index: 10;
             max-width: 480px;
             width: 100%;
             margin: auto;
@@ -170,7 +174,7 @@
         @keyframes authQuickIn {
             0% {
                 opacity: 0;
-                transform: translateY(10px);
+                transform: translateY(12px);
             }
             100% {
                 opacity: 1;
@@ -179,12 +183,12 @@
         }
 
         .auth-card {
-            border: 1px solid var(--border-grey);
+            border: 1px solid #000000;
             background-color: #FFFFFF;
             padding: 2.25rem 2.25rem;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 16px 45px rgba(0, 0, 0, 0.22);
             position: relative;
-            z-index: 2;
+            z-index: 10;
         }
 
         .auth-header {
@@ -197,14 +201,15 @@
             margin-top: 1.5rem;
             text-align: center;
             font-size: 12px;
-            color: var(--text-dark-grey);
+            color: #000000;
+            font-weight: 500;
             position: relative;
-            z-index: 2;
+            z-index: 10;
         }
     </style>
 </head>
 <body>
-    {{-- Stable Blurry Black Background Decor with Quick Reload Bloom Animation --}}
+    {{-- Stable Blurry Black Background Decor (80% Visibility) with Quick Reload Bloom Animation --}}
     <div class="auth-bg-decor" aria-hidden="true">
         <div class="auth-blur-shape auth-blur-1"></div>
         <div class="auth-blur-shape auth-blur-2"></div>
