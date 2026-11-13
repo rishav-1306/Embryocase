@@ -24,7 +24,7 @@ class ExampleTest extends TestCase
         $response = $this->get('/login');
         $response->assertStatus(200);
         $response->assertSee('Embryologist Authentication');
-        $response->assertSee('Unique Special Key');
+        $response->assertSee('Step 1: Enter Your Full Name');
     }
 
     /**

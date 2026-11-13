@@ -44,7 +44,7 @@ class EmbryoCaseWorkflowTest extends TestCase
         ]);
         $response->assertSessionHasErrors('auth_failed');
 
-        // Attempt 2: All 4 correct credentials should succeed and redirect to OTP verification
+        // Attempt 2: All correct credentials should succeed and redirect to OTP verification
         $response2 = $this->post('/login', [
             'name' => 'Dr. Sarah Chen',
             'email' => 'sarah.chen@embryocase.lab',
@@ -54,6 +54,105 @@ class EmbryoCaseWorkflowTest extends TestCase
         $response2->assertStatus(302);
         $response2->assertRedirect(route('auth.otp.show'));
         $this->assertTrue(session()->has('pending_auth'));
+    }
+
+    public function test_embryologist_sequential_step_by_step_authentication_flow(): void
+    {
+        $specialKey = 'RISHAV1306';
+        $user = User::create([
+            'name' => 'Aryan',
+            'email' => 'nikhilaryan0223@gmail.com',
+            'password' => Hash::make('Aryan@2005'),
+            'role' => 'embryologist',
+            'status' => 'active',
+            'special_key_hash' => Hash::make($specialKey),
+            'email_verified_at' => now(),
+        ]);
+
+        // Step 1: Initial load shows Step 1 Name input
+        $step1Get = $this->get('/login');
+        $step1Get->assertStatus(200);
+        $step1Get->assertSee('Step 1: Enter Your Full Name');
+        $step1Get->assertDontSee('Step 2: Enter Secret Key');
+
+        // Step 1: Invalid Name
+        $step1Fail = $this->post('/login', [
+            'step' => 1,
+            'name' => 'Unknown Person',
+        ]);
+        $step1Fail->assertSessionHasErrors('name');
+
+        // Step 1: Valid Name
+        $step1Success = $this->post('/login', [
+            'step' => 1,
+            'name' => 'Aryan',
+        ]);
+        $step1Success->assertRedirect('/login');
+        $this->assertEquals(2, session('embryo_auth_step'));
+        $this->assertEquals('Aryan', session('embryo_auth_name'));
+
+        // Step 2: Renders Step 2 Secret Key input
+        $step2Get = $this->get('/login');
+        $step2Get->assertStatus(200);
+        $step2Get->assertSee('Step 2: Enter Secret Key');
+        $step2Get->assertSee('Aryan');
+        $step2Get->assertDontSee('Step 1: Enter Your Full Name');
+
+        // Step 2: Invalid Secret Key
+        $step2Fail = $this->post('/login', [
+            'step' => 2,
+            'special_key' => 'WRONG-KEY',
+        ]);
+        $step2Fail->assertSessionHasErrors('special_key');
+
+        // Step 2: Valid Secret Key
+        $step2Success = $this->post('/login', [
+            'step' => 2,
+            'special_key' => $specialKey,
+        ]);
+        $step2Success->assertRedirect('/login');
+        $this->assertEquals(3, session('embryo_auth_step'));
+        $this->assertEquals($user->id, session('embryo_auth_user_id'));
+
+        // Step 3: Renders Step 3 Email input
+        $step3Get = $this->get('/login');
+        $step3Get->assertStatus(200);
+        $step3Get->assertSee('Step 3: Enter Registered Email');
+        $step3Get->assertSee('KEY VERIFIED');
+
+        // Step 3: Invalid Email
+        $step3Fail = $this->post('/login', [
+            'step' => 3,
+            'email' => 'wrong.email@gmail.com',
+        ]);
+        $step3Fail->assertSessionHasErrors('email');
+
+        // Step 3: Valid Email -> Dispatches OTP and redirects to OTP verification
+        $step3Success = $this->post('/login', [
+            'step' => 3,
+            'email' => 'nikhilaryan0223@gmail.com',
+        ]);
+        $step3Success->assertStatus(302);
+        $step3Success->assertRedirect(route('auth.otp.show'));
+        $this->assertEquals($user->id, session('pending_auth')['user_id']);
+        $this->assertEquals('nikhilaryan0223@gmail.com', session('pending_auth')['email']);
+
+        // Check step session variables were wiped clean
+        $this->assertFalse(session()->has('embryo_auth_step'));
+        $this->assertFalse(session()->has('embryo_auth_name'));
+    }
+
+    public function test_embryologist_login_reset_clears_step_session(): void
+    {
+        $this->withSession([
+            'embryo_auth_step' => 2,
+            'embryo_auth_name' => 'Aryan',
+        ]);
+
+        $response = $this->get('/login/reset');
+        $response->assertRedirect('/login');
+        $this->assertFalse(session()->has('embryo_auth_step'));
+        $this->assertFalse(session()->has('embryo_auth_name'));
     }
 
     public function test_admin_login_and_otp_workflow(): void
@@ -67,9 +166,15 @@ class EmbryoCaseWorkflowTest extends TestCase
             'email_verified_at' => now(),
         ]);
 
+        // Non-existent admin email fails
+        $fail = $this->post('/login/admin', [
+            'email' => 'unknown.admin@embryocase.lab',
+        ]);
+        $fail->assertSessionHasErrors('email');
+
+        // Valid admin email succeeds and sends OTP
         $response = $this->post('/login/admin', [
             'email' => 'admin@embryocase.lab',
-            'password' => 'AdminPassword123!',
         ]);
 
         $response->assertStatus(302);

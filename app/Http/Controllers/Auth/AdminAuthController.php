@@ -8,9 +8,7 @@ use App\Models\User;
 use App\Services\OtpService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
-use Illuminate\Support\Str;
 
 class AdminAuthController extends Controller
 {
@@ -36,32 +34,37 @@ class AdminAuthController extends Controller
     {
         $request->validate([
             'email' => ['required', 'string', 'email'],
-            'password' => ['required', 'string'],
+        ], [
+            'email.required' => 'Please enter the registered administrator email address.',
+            'email.email' => 'Please enter a valid email address.',
         ]);
 
-        $throttleKey = 'admin_login|' . $request->ip();
+        $throttleKey = 'admin_login|' . $request->ip() . '|' . trim(strtolower($request->email));
 
         if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
             $seconds = RateLimiter::availableIn($throttleKey);
             return back()->withErrors([
-                'email' => "Too many login attempts. Access temporarily locked for {$seconds} seconds.",
+                'email' => "Too many attempts. Access temporarily locked for {$seconds} seconds.",
             ]);
         }
 
-        $admin = User::where('email', $request->email)
-            ->where('role', 'admin')
-            ->first();
+        $admin = User::where('role', 'admin')
+            ->get()
+            ->first(function ($user) use ($request) {
+                return trim(strtolower($user->email)) === trim(strtolower($request->email));
+            });
 
-        if (!$admin || !Hash::check($request->password, $admin->password)) {
+        if (!$admin) {
             RateLimiter::hit($throttleKey, 300);
 
-            ActivityLog::record($admin?->id, 'admin_login_failed', null, [
+            ActivityLog::record(null, 'admin_login_failed', null, [
                 'email' => $request->email,
+                'reason' => 'email_not_found',
                 'ip' => $request->ip(),
             ]);
 
             return back()->withErrors([
-                'email' => 'The provided administrator credentials do not match our records.',
+                'email' => 'The provided administrator email does not match our records.',
             ])->withInput($request->only('email'));
         }
 
@@ -73,7 +76,7 @@ class AdminAuthController extends Controller
 
         RateLimiter::clear($throttleKey);
 
-        // Dispatch OTP
+        // Dispatch 6-Digit OTP to Admin Email
         $result = $this->otpService->generateAndSend($admin->email, 'login', $admin);
 
         if (!$result['success']) {
@@ -105,4 +108,3 @@ class AdminAuthController extends Controller
         return redirect()->route('login')->with('status', 'You have been successfully logged out.');
     }
 }
-

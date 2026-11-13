@@ -34,11 +34,12 @@ Route::get('/', function () {
 
 // Authentication Routes
 Route::prefix('')->group(function () {
-    // Embryologist Login (4 Mandatory Credentials)
+    // Embryologist Multi-Step Authentication
     Route::get('/login', [EmbryologistAuthController::class, 'showLoginForm'])->name('login');
+    Route::get('/login/reset', [EmbryologistAuthController::class, 'resetLogin'])->name('login.reset');
     Route::post('/login', [EmbryologistAuthController::class, 'submitCredentials'])->name('login.embryologist.submit');
 
-    // Admin Login (Email + Password)
+    // Admin Login (Email -> OTP)
     Route::get('/login/admin', [AdminAuthController::class, 'showLoginForm'])->name('admin.login');
     Route::post('/login/admin', [AdminAuthController::class, 'submitCredentials'])->name('admin.login.submit');
 
