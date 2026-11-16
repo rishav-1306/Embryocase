@@ -20,6 +20,8 @@ class User extends Authenticatable
         'role',
         'status',
         'special_key_hash',
+        'google2fa_secret',
+        'google2fa_enabled',
         'last_login_at',
         'last_login_ip',
         'created_by',
@@ -29,6 +31,7 @@ class User extends Authenticatable
         'password',
         'remember_token',
         'special_key_hash',
+        'google2fa_secret',
     ];
 
     protected function casts(): array
@@ -37,6 +40,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'last_login_at' => 'datetime',
             'password' => 'hashed',
+            'google2fa_enabled' => 'boolean',
         ];
     }
 
@@ -63,6 +67,19 @@ class User extends Authenticatable
     public function isInactive(): bool
     {
         return $this->status === 'inactive';
+    }
+
+    public function hasGoogle2FA(): bool
+    {
+        return !empty($this->google2fa_secret) && (bool)$this->google2fa_enabled;
+    }
+
+    public function resetGoogle2FA(): void
+    {
+        $this->update([
+            'google2fa_secret' => null,
+            'google2fa_enabled' => false,
+        ]);
     }
 
     public function verifySpecialKey(string $plainKey): bool

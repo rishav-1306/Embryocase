@@ -108,6 +108,7 @@ Route::middleware(['admin'])->prefix('admin')->group(function () {
     Route::post('/embryologists/{id}/status', [EmbryologistManagementController::class, 'updateStatus'])->name('admin.embryologists.status');
     Route::post('/embryologists/{id}/regenerate-key', [EmbryologistManagementController::class, 'regenerateKey'])->name('admin.embryologists.regenerate-key');
     Route::post('/embryologists/{id}/revoke-key', [EmbryologistManagementController::class, 'revokeKey'])->name('admin.embryologists.revoke-key');
+    Route::post('/embryologists/{id}/reset-2fa', [EmbryologistManagementController::class, 'resetGoogle2FA'])->name('admin.embryologists.reset-2fa');
 
     // Audit History & Backups
     Route::get('/activity-logs', [ActivityLogController::class, 'index'])->name('admin.activity.index');

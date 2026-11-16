@@ -187,5 +187,18 @@ class EmbryologistManagementController extends Controller
 
         return back()->with('status', "Special Key for {$embryologist->name} has been revoked. Login is immediately blocked until a new key is issued.");
     }
+
+    public function resetGoogle2FA(Request $request, $id)
+    {
+        $embryologist = User::where('role', 'embryologist')->findOrFail($id);
+        $embryologist->resetGoogle2FA();
+
+        ActivityLog::record(auth()->id(), 'google2fa_reset', null, [
+            'target_user_id' => $embryologist->id,
+            'target_email' => $embryologist->email,
+        ]);
+
+        return back()->with('status', "Google Authenticator 2FA has been reset for {$embryologist->name}. A new QR code will be presented on next login.");
+    }
 }
 

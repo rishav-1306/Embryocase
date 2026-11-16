@@ -172,6 +172,29 @@
                 </div>
             </div>
         </div>
+
+        <!-- Google Authenticator (2FA) Status & Reset -->
+        <div class="sci-card mb-4">
+            <div class="sci-card-header">
+                <span class="sci-card-title">GOOGLE AUTHENTICATOR (2FA)</span>
+                @if($embryologist->hasGoogle2FA())
+                    <span class="badge-sci badge-sci-success">CONFIGURED &amp; ACTIVE</span>
+                @else
+                    <span class="badge-sci badge-sci-neutral">PENDING SETUP</span>
+                @endif
+            </div>
+            <div class="sci-card-body">
+                <p class="text-meta mb-3" style="font-size: 13px;">
+                    Two-factor verification via Google Authenticator TOTP QR code.
+                </p>
+                <form method="POST" action="{{ route('admin.embryologists.reset-2fa', $embryologist->id) }}" onsubmit="return confirm('Reset Google Authenticator 2FA for this user? They will be presented with a fresh QR code on their next login.');">
+                    @csrf
+                    <button type="submit" class="btn btn-sci-secondary w-100">
+                        RESET GOOGLE AUTHENTICATOR (NEW QR)
+                    </button>
+                </form>
+            </div>
+        </div>
     </div>
 
     <!-- Right Column: Cases & Activity -->

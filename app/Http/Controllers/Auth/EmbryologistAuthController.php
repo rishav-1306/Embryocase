@@ -237,13 +237,6 @@ class EmbryologistAuthController extends Controller
 
         RateLimiter::clear($throttleKey);
 
-        // Step 3 matched! Dispatch 6-digit OTP
-        $result = $this->otpService->generateAndSend($user->email, 'login', $user);
-
-        if (!$result['success']) {
-            return back()->withErrors(['email' => $result['message']]);
-        }
-
         // Clean up step session
         $request->session()->forget([
             'embryo_auth_step',
@@ -252,16 +245,14 @@ class EmbryologistAuthController extends Controller
             'embryo_auth_candidates',
         ]);
 
-        // Store pending auth
+        // Store pending auth for Google Authenticator verification
         $request->session()->put('pending_auth', [
             'user_id' => $user->id,
             'email' => $user->email,
             'role' => 'embryologist',
         ]);
 
-        return redirect()->route('auth.otp.show')
-            ->with('status', $result['message'])
-            ->with('debug_otp', $result['debug_otp']);
+        return redirect()->route('auth.otp.show');
     }
 
     /**
@@ -285,19 +276,12 @@ class EmbryologistAuthController extends Controller
             ]);
         }
 
-        $result = $this->otpService->generateAndSend($user->email, 'login', $user);
-        if (!$result['success']) {
-            return back()->withErrors(['auth_failed' => $result['message']]);
-        }
-
         $request->session()->put('pending_auth', [
             'user_id' => $user->id,
             'email' => $user->email,
             'role' => 'embryologist',
         ]);
 
-        return redirect()->route('auth.otp.show')
-            ->with('status', $result['message'])
-            ->with('debug_otp', $result['debug_otp']);
+        return redirect()->route('auth.otp.show');
     }
 }

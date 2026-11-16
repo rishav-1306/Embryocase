@@ -76,22 +76,14 @@ class AdminAuthController extends Controller
 
         RateLimiter::clear($throttleKey);
 
-        // Dispatch 6-Digit OTP to Admin Email
-        $result = $this->otpService->generateAndSend($admin->email, 'login', $admin);
-
-        if (!$result['success']) {
-            return back()->withErrors(['email' => $result['message']]);
-        }
-
-        // Store pending credentials in session
+        // Store pending credentials in session for Google Authenticator verification
         $request->session()->put('pending_auth', [
             'user_id' => $admin->id,
             'email' => $admin->email,
             'role' => 'admin',
         ]);
 
-        return redirect()->route('auth.otp.show')->with('status', $result['message'])
-            ->with('debug_otp', $result['debug_otp']);
+        return redirect()->route('auth.otp.show');
     }
 
     public function logout(Request $request)

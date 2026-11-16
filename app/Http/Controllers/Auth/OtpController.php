@@ -5,17 +5,17 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\ActivityLog;
 use App\Models\User;
-use App\Services\OtpService;
+use App\Services\Google2FAService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class OtpController extends Controller
 {
-    protected OtpService $otpService;
+    protected Google2FAService $google2FAService;
 
-    public function __construct(OtpService $otpService)
+    public function __construct(Google2FAService $google2FAService)
     {
-        $this->otpService = $otpService;
+        $this->google2FAService = $google2FAService;
     }
 
     public function showVerifyForm(Request $request)
@@ -28,9 +28,28 @@ class OtpController extends Controller
             ]);
         }
 
+        $user = User::find($pending['user_id']);
+        if (!$user || !$user->isActive()) {
+            $request->session()->forget('pending_auth');
+            return redirect()->route('login')->withErrors([
+                'auth_failed' => 'User account is not active.',
+            ]);
+        }
+
+        $secret = $this->google2FAService->getOrCreateSecret($user);
+        $otpauthUri = $this->google2FAService->getQrCodeUri($user->email, $secret);
+        $qrCode = $this->google2FAService->getQrCodeDataUri($otpauthUri);
+
+        $isFirstSetup = !$user->google2fa_enabled;
+        $debugOtp = config('app.debug') ? $this->google2FAService->getCurrentOtp($secret) : null;
+
         return view('auth.otp_verify', [
-            'email' => $pending['email'],
-            'role' => $pending['role'],
+            'email' => $user->email,
+            'role' => $user->role,
+            'secret' => $secret,
+            'qrCode' => $qrCode,
+            'isFirstSetup' => $isFirstSetup,
+            'debugOtp' => $debugOtp,
         ]);
     }
 
@@ -39,7 +58,7 @@ class OtpController extends Controller
         $request->validate([
             'otp' => ['required', 'string', 'size:6'],
         ], [
-            'otp.required' => 'The 6-digit verification code is required.',
+            'otp.required' => 'The 6-digit Google Authenticator verification code is required.',
             'otp.size' => 'The verification code must be exactly 6 digits.',
         ]);
 
@@ -51,12 +70,6 @@ class OtpController extends Controller
             ]);
         }
 
-        $result = $this->otpService->verify($pending['email'], $request->otp, 'login');
-
-        if (!$result['success']) {
-            return back()->withErrors(['otp' => $result['message']]);
-        }
-
         $user = User::find($pending['user_id']);
 
         if (!$user || !$user->isActive()) {
@@ -64,6 +77,23 @@ class OtpController extends Controller
             return redirect()->route('login')->withErrors([
                 'auth_failed' => 'User account is not active.',
             ]);
+        }
+
+        $secret = $this->google2FAService->getOrCreateSecret($user);
+        $isValid = $this->google2FAService->verifyKey($secret, $request->otp);
+
+        if (!$isValid) {
+            ActivityLog::record($user->id, 'google2fa_failed', null, [
+                'ip' => $request->ip(),
+                'role' => $user->role,
+            ]);
+
+            return back()->withErrors(['otp' => 'Invalid Google Authenticator code. Please check your app and try again.']);
+        }
+
+        if (!$user->google2fa_enabled) {
+            $user->google2fa_enabled = true;
+            $user->save();
         }
 
         // Complete authentication
@@ -79,6 +109,7 @@ class OtpController extends Controller
         ActivityLog::record($user->id, 'login_success', null, [
             'ip' => $request->ip(),
             'role' => $user->role,
+            'method' => 'google_authenticator',
         ]);
 
         if ($user->isAdmin()) {
@@ -93,20 +124,16 @@ class OtpController extends Controller
         $pending = $request->session()->get('pending_auth');
 
         if (!$pending) {
-            return redirect()->route('login')->withErrors([
-                'auth_failed' => 'Verification session expired.',
-            ]);
+            return redirect()->route('login');
         }
 
         $user = User::find($pending['user_id']);
-        $result = $this->otpService->generateAndSend($pending['email'], 'login', $user);
-
-        if (!$result['success']) {
-            return back()->withErrors(['otp' => $result['message']]);
+        if ($user) {
+            $user->google2fa_secret = $this->google2FAService->generateSecretKey(16);
+            $user->google2fa_enabled = false;
+            $user->save();
         }
 
-        return back()->with('status', $result['message'])
-            ->with('debug_otp', $result['debug_otp']);
+        return redirect()->route('auth.otp.show')->with('status', 'A new Google Authenticator key and QR code have been generated.');
     }
 }
-

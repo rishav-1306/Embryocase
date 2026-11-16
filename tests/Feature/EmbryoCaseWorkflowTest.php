@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\EmbryoCase;
 use App\Models\EmbryoImage;
 use App\Models\User;
+use App\Services\Google2FAService;
 use App\Services\OtpService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
@@ -325,6 +326,103 @@ class EmbryoCaseWorkflowTest extends TestCase
         $response->assertStatus(302);
         $response->assertRedirect(route('auth.otp.show'));
         $this->assertEquals($ayush->id, session('pending_auth')['user_id']);
+    }
+
+    public function test_google_authenticator_qr_screen_renders_and_authorizes_session(): void
+    {
+        $user = User::create([
+            'name' => 'Aryan',
+            'email' => 'nikhilaryan0223@gmail.com',
+            'password' => Hash::make('Aryan@2005'),
+            'role' => 'embryologist',
+            'status' => 'active',
+            'special_key_hash' => Hash::make('RISHAV1306'),
+            'email_verified_at' => now(),
+        ]);
+
+        // Access 2FA verification screen with pending auth session
+        $response = $this->withSession([
+            'pending_auth' => [
+                'user_id' => $user->id,
+                'email' => $user->email,
+                'role' => $user->role,
+            ],
+        ])->get(route('auth.otp.show'));
+
+        $response->assertStatus(200);
+        $response->assertSee('Google Authenticator');
+        $response->assertSee('Scan with Google Authenticator');
+        $response->assertSee('data:image/svg+xml');
+
+        // Secret should have been created on the user model
+        $user->refresh();
+        $this->assertNotEmpty($user->google2fa_secret);
+
+        // Attempt 1: Invalid 6-digit code fails
+        $failResponse = $this->withSession([
+            'pending_auth' => [
+                'user_id' => $user->id,
+                'email' => $user->email,
+                'role' => $user->role,
+            ],
+        ])->post(route('auth.otp.verify'), [
+            'otp' => '000000',
+        ]);
+        $failResponse->assertSessionHasErrors('otp');
+        $this->assertGuest();
+
+        // Attempt 2: Valid TOTP code authorizes session and redirects to dashboard
+        $google2FA = app(Google2FAService::class);
+        $validOtp = $google2FA->getCurrentOtp($user->google2fa_secret);
+
+        $successResponse = $this->withSession([
+            'pending_auth' => [
+                'user_id' => $user->id,
+                'email' => $user->email,
+                'role' => $user->role,
+            ],
+        ])->post(route('auth.otp.verify'), [
+            'otp' => $validOtp,
+        ]);
+
+        $successResponse->assertStatus(302);
+        $successResponse->assertRedirect(route('embryologist.dashboard'));
+        $this->assertAuthenticatedAs($user);
+        $this->assertTrue($user->fresh()->google2fa_enabled);
+    }
+
+    public function test_admin_can_reset_embryologist_google_2fa(): void
+    {
+        $admin = User::create([
+            'name' => 'Rishav',
+            'email' => 'rishav1306singh@gmail.com',
+            'password' => Hash::make('Rishav@1306'),
+            'role' => 'admin',
+            'status' => 'active',
+            'email_verified_at' => now(),
+        ]);
+
+        $embryologist = User::create([
+            'name' => 'Aryan',
+            'email' => 'nikhilaryan0223@gmail.com',
+            'password' => Hash::make('Aryan@2005'),
+            'role' => 'embryologist',
+            'status' => 'active',
+            'special_key_hash' => Hash::make('RISHAV1306'),
+            'google2fa_secret' => 'JBSWY3DPEHPK3PXP',
+            'google2fa_enabled' => true,
+            'email_verified_at' => now(),
+        ]);
+
+        $this->actingAs($admin);
+
+        $response = $this->post(route('admin.embryologists.reset-2fa', $embryologist->id));
+        $response->assertStatus(302);
+        $response->assertSessionHas('status');
+
+        $embryologist->refresh();
+        $this->assertNull($embryologist->google2fa_secret);
+        $this->assertFalse($embryologist->google2fa_enabled);
     }
 
     public function test_delete_embryo_image_removes_from_database(): void
