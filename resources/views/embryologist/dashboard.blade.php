@@ -125,7 +125,7 @@
 
 <div class="row g-4">
     <!-- Recent Cases -->
-    <div class="col-12 col-xl-8">
+    <div class="col-12">
         <div class="sci-card">
             <div class="sci-card-header">
                 <span class="sci-card-title">RECENT EMBRYO CASES</span>
@@ -174,43 +174,6 @@
                                 <td colspan="7" class="text-center py-5 text-muted">
                                     No embryo cases uploaded yet. Click <strong>+ CREATE NEW EMBRYO CASE</strong> to register your first clinical case.
                                 </td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <!-- Recent Personal Activities -->
-    <div class="col-12 col-xl-4">
-        <div class="sci-card">
-            <div class="sci-card-header">
-                <span class="sci-card-title">MY RECENT ACTIONS</span>
-            </div>
-            <div class="table-responsive">
-                <table class="table-sci">
-                    <thead>
-                        <tr>
-                            <th>ACTION</th>
-                            <th>CASE</th>
-                            <th>TIME</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse($recentActivities as $act)
-                            <tr>
-                                <td>
-                                    <span class="mono" style="font-size: 11px;">
-                                        {{ strtoupper(str_replace('_', ' ', $act->action)) }}
-                                    </span>
-                                </td>
-                                <td class="mono" style="font-size: 11px;">{{ $act->case_id ?? '—' }}</td>
-                                <td class="text-muted" style="font-size: 11px;">{{ $act->created_at?->diffForHumans() }}</td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="3" class="text-center py-4 text-muted">No personal logs recorded.</td>
                             </tr>
                         @endforelse
                     </tbody>

@@ -25,11 +25,6 @@ class EmbryologistDashboardController extends Controller
             ->take(8)
             ->get();
 
-        $recentActivities = ActivityLog::where('user_id', $user->id)
-            ->latest('id')
-            ->take(10)
-            ->get();
-
         $pendingTodayCases = EmbryoCase::getCasesWithMissingTodayImage($user->id);
 
         return view('embryologist.dashboard', compact(
@@ -38,7 +33,6 @@ class EmbryologistDashboardController extends Controller
             'casesCompleted',
             'totalImagesUploaded',
             'recentCases',
-            'recentActivities',
             'pendingTodayCases'
         ));
     }

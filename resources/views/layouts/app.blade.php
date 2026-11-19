@@ -69,9 +69,6 @@
             <a href="{{ route('cases.create') }}" class="sci-nav-link {{ request()->routeIs('cases.create') ? 'active' : '' }}">
                 + CREATE NEW CASE
             </a>
-            <a href="{{ route('embryologist.activity') }}" class="sci-nav-link {{ request()->routeIs('embryologist.activity') ? 'active' : '' }}">
-                MY ACCESS LOG
-            </a>
         @endif
     </nav>
 
